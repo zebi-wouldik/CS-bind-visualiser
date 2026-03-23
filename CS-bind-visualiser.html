@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>CS2 Bind Visualizer</title>
+    <title>Ultimate CS2 Bind Visualizer</title>
     <style>
         body {
             font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
@@ -63,11 +63,7 @@
             gap: 8px;
         }
         
-        .row {
-            display: flex;
-            gap: 8px;
-            justify-content: center;
-        }
+        .row { display: flex; gap: 8px; justify-content: center; }
 
         /* Key Styles */
         .key {
@@ -90,7 +86,6 @@
             line-height: 1.2;
         }
         .key:hover { background-color: #45475a; }
-        
         .key.hidden { visibility: hidden; }
 
         /* Highlight bound keys */
@@ -150,7 +145,7 @@
 </head>
 <body>
 
-    <h2>CS2 Bind Visualizer</h2>
+    <h2>Ultimate CS2 Bind Visualizer</h2>
     
     <div class="controls-section">
         <div class="control-group">
@@ -158,12 +153,9 @@
             <input type="file" id="cfgInput" accept=".cfg,.txt">
         </div>
         <div class="control-group">
-            <label for="layoutSwitch"><strong>2. Keyboard Layout</strong></label>
+            <label for="layoutSwitch"><strong>2. Keyboard Layout Database</strong></label>
             <select id="layoutSwitch">
-                <option value="qwerty">QWERTY (US)</option>
-                <option value="azerty">AZERTY (French)</option>
-                <option value="qwertz">QWERTZ (German)</option>
-            </select>
+                </select>
         </div>
     </div>
 
@@ -173,93 +165,93 @@
         <div class="main-board-container">
             <div class="block f-keys">
                 <div class="row" style="justify-content: flex-start;">
-                    <div class="key" data-key="escape esc">Esc</div>
+                    <div class="key static-key" data-binds="escape esc">Esc</div>
                     <div style="width: 25px;"></div>
-                    <div class="key" data-key="f1">F1</div>
-                    <div class="key" data-key="f2">F2</div>
-                    <div class="key" data-key="f3">F3</div>
-                    <div class="key" data-key="f4">F4</div>
+                    <div class="key static-key" data-binds="f1">F1</div>
+                    <div class="key static-key" data-binds="f2">F2</div>
+                    <div class="key static-key" data-binds="f3">F3</div>
+                    <div class="key static-key" data-binds="f4">F4</div>
                     <div style="width: 15px;"></div>
-                    <div class="key" data-key="f5">F5</div>
-                    <div class="key" data-key="f6">F6</div>
-                    <div class="key" data-key="f7">F7</div>
-                    <div class="key" data-key="f8">F8</div>
+                    <div class="key static-key" data-binds="f5">F5</div>
+                    <div class="key static-key" data-binds="f6">F6</div>
+                    <div class="key static-key" data-binds="f7">F7</div>
+                    <div class="key static-key" data-binds="f8">F8</div>
                     <div style="width: 15px;"></div>
-                    <div class="key" data-key="f9">F9</div>
-                    <div class="key" data-key="f10">F10</div>
-                    <div class="key" data-key="f11">F11</div>
-                    <div class="key" data-key="f12">F12</div>
+                    <div class="key static-key" data-binds="f9">F9</div>
+                    <div class="key static-key" data-binds="f10">F10</div>
+                    <div class="key static-key" data-binds="f11">F11</div>
+                    <div class="key static-key" data-binds="f12">F12</div>
                 </div>
             </div>
 
             <div class="block main-keyboard">
                 <div class="row">
-                    <div class="key dyn-key" data-qwerty-txt="~ `" data-azerty-txt="²" data-qwertz-txt="^ °" data-qwerty-bind="` ~" data-azerty-bind="² ~ `" data-qwertz-bind="^">~</div>
-                    <div class="key dyn-key" data-qwerty-txt="1 !" data-azerty-txt="& 1" data-qwertz-txt="1 !" data-qwerty-bind="1" data-azerty-bind="1 &" data-qwertz-bind="1">1</div>
-                    <div class="key dyn-key" data-qwerty-txt="2 @" data-azerty-txt="é 2" data-qwertz-txt="2 &quot;" data-qwerty-bind="2" data-azerty-bind="2 é" data-qwertz-bind="2">2</div>
-                    <div class="key dyn-key" data-qwerty-txt="3 #" data-azerty-txt="&quot; 3" data-qwertz-txt="3 §" data-qwerty-bind="3" data-azerty-bind="3 &quot;" data-qwertz-bind="3">3</div>
-                    <div class="key dyn-key" data-qwerty-txt="4 $" data-azerty-txt="' 4" data-qwertz-txt="4 $" data-qwerty-bind="4" data-azerty-bind="4 '" data-qwertz-bind="4">4</div>
-                    <div class="key dyn-key" data-qwerty-txt="5 %" data-azerty-txt="( 5" data-qwertz-txt="5 %" data-qwerty-bind="5" data-azerty-bind="5 (" data-qwertz-bind="5">5</div>
-                    <div class="key dyn-key" data-qwerty-txt="6 ^" data-azerty-txt="- 6" data-qwertz-txt="6 &" data-qwerty-bind="6" data-azerty-bind="6 -" data-qwertz-bind="6">6</div>
-                    <div class="key dyn-key" data-qwerty-txt="7 &" data-azerty-txt="è 7" data-qwertz-txt="7 /" data-qwerty-bind="7" data-azerty-bind="7 è" data-qwertz-bind="7">7</div>
-                    <div class="key dyn-key" data-qwerty-txt="8 *" data-azerty-txt="_ 8" data-qwertz-txt="8 (" data-qwerty-bind="8" data-azerty-bind="8 _" data-qwertz-bind="8">8</div>
-                    <div class="key dyn-key" data-qwerty-txt="9 (" data-azerty-txt="ç 9" data-qwertz-txt="9 )" data-qwerty-bind="9" data-azerty-bind="9 ç" data-qwertz-bind="9">9</div>
-                    <div class="key dyn-key" data-qwerty-txt="0 )" data-azerty-txt="à 0" data-qwertz-txt="0 =" data-qwerty-bind="0" data-azerty-bind="0 à" data-qwertz-bind="0">0</div>
-                    <div class="key dyn-key" data-qwerty-txt="- _" data-azerty-txt=") °" data-qwertz-txt="ß ?" data-qwerty-bind="-" data-azerty-bind=") °" data-qwertz-bind="ß">-</div>
-                    <div class="key dyn-key" data-qwerty-txt="= +" data-azerty-txt="= +" data-qwertz-txt="´ `" data-qwerty-bind="=" data-azerty-bind="=" data-qwertz-bind="´">=</div>
+                    <div class="key dyn-key" data-code="Backquote"></div>
+                    <div class="key dyn-key" data-code="Digit1"></div>
+                    <div class="key dyn-key" data-code="Digit2"></div>
+                    <div class="key dyn-key" data-code="Digit3"></div>
+                    <div class="key dyn-key" data-code="Digit4"></div>
+                    <div class="key dyn-key" data-code="Digit5"></div>
+                    <div class="key dyn-key" data-code="Digit6"></div>
+                    <div class="key dyn-key" data-code="Digit7"></div>
+                    <div class="key dyn-key" data-code="Digit8"></div>
+                    <div class="key dyn-key" data-code="Digit9"></div>
+                    <div class="key dyn-key" data-code="Digit0"></div>
+                    <div class="key dyn-key" data-code="Minus"></div>
+                    <div class="key dyn-key" data-code="Equal"></div>
                 </div>
                 <div class="row">
-                    <div class="key tab" data-key="tab">Tab</div>
-                    <div class="key dyn-key" data-qwerty-txt="Q" data-azerty-txt="A" data-qwertz-txt="Q" data-qwerty-bind="q scancode20" data-azerty-bind="a q scancode20" data-qwertz-bind="q scancode20">Q</div>
-                    <div class="key dyn-key" data-qwerty-txt="W" data-azerty-txt="Z" data-qwertz-txt="W" data-qwerty-bind="w scancode26" data-azerty-bind="z w scancode26" data-qwertz-bind="w scancode26">W</div>
-                    <div class="key dyn-key" data-qwerty-txt="E" data-azerty-txt="E" data-qwertz-txt="E" data-qwerty-bind="e scancode8" data-azerty-bind="e scancode8" data-qwertz-bind="e scancode8">E</div>
-                    <div class="key dyn-key" data-qwerty-txt="R" data-azerty-txt="R" data-qwertz-txt="R" data-qwerty-bind="r scancode21" data-azerty-bind="r scancode21" data-qwertz-bind="r scancode21">R</div>
-                    <div class="key dyn-key" data-qwerty-txt="T" data-azerty-txt="T" data-qwertz-txt="T" data-qwerty-bind="t scancode23" data-azerty-bind="t scancode23" data-qwertz-bind="t scancode23">T</div>
-                    <div class="key dyn-key" data-qwerty-txt="Y" data-azerty-txt="Y" data-qwertz-txt="Z" data-qwerty-bind="y scancode28" data-azerty-bind="y scancode28" data-qwertz-bind="z y scancode28">Y</div>
-                    <div class="key dyn-key" data-qwerty-txt="U" data-azerty-txt="U" data-qwertz-txt="U" data-qwerty-bind="u scancode24" data-azerty-bind="u scancode24" data-qwertz-bind="u scancode24">U</div>
-                    <div class="key dyn-key" data-qwerty-txt="I" data-azerty-txt="I" data-qwertz-txt="I" data-qwerty-bind="i scancode12" data-azerty-bind="i scancode12" data-qwertz-bind="i scancode12">I</div>
-                    <div class="key dyn-key" data-qwerty-txt="O" data-azerty-txt="O" data-qwertz-txt="O" data-qwerty-bind="o scancode18" data-azerty-bind="o scancode18" data-qwertz-bind="o scancode18">O</div>
-                    <div class="key dyn-key" data-qwerty-txt="P" data-azerty-txt="P" data-qwertz-txt="P" data-qwerty-bind="p scancode19" data-azerty-bind="p scancode19" data-qwertz-bind="p scancode19">P</div>
-                    <div class="key dyn-key" data-qwerty-txt="[ {" data-azerty-txt="^ ¨" data-qwertz-txt="Ü" data-qwerty-bind="[" data-azerty-bind="^ [" data-qwertz-bind="ü [">[</div>
-                    <div class="key dyn-key" data-qwerty-txt="] }" data-azerty-txt="$ £" data-qwertz-txt="+ *" data-qwerty-bind="]" data-azerty-bind="$ ]" data-qwertz-bind="+ ]">]</div>
+                    <div class="key tab static-key" data-binds="tab">Tab</div>
+                    <div class="key dyn-key" data-code="KeyQ"></div>
+                    <div class="key dyn-key" data-code="KeyW"></div>
+                    <div class="key dyn-key" data-code="KeyE"></div>
+                    <div class="key dyn-key" data-code="KeyR"></div>
+                    <div class="key dyn-key" data-code="KeyT"></div>
+                    <div class="key dyn-key" data-code="KeyY"></div>
+                    <div class="key dyn-key" data-code="KeyU"></div>
+                    <div class="key dyn-key" data-code="KeyI"></div>
+                    <div class="key dyn-key" data-code="KeyO"></div>
+                    <div class="key dyn-key" data-code="KeyP"></div>
+                    <div class="key dyn-key" data-code="BracketLeft"></div>
+                    <div class="key dyn-key" data-code="BracketRight"></div>
                 </div>
                 <div class="row">
-                    <div class="key caps" data-key="caps capslock">Caps</div>
-                    <div class="key dyn-key" data-qwerty-txt="A" data-azerty-txt="Q" data-qwertz-txt="A" data-qwerty-bind="a scancode4" data-azerty-bind="q a scancode4" data-qwertz-bind="a scancode4">A</div>
-                    <div class="key dyn-key" data-qwerty-txt="S" data-azerty-txt="S" data-qwertz-txt="S" data-qwerty-bind="s scancode22" data-azerty-bind="s scancode22" data-qwertz-bind="s scancode22">S</div>
-                    <div class="key dyn-key" data-qwerty-txt="D" data-azerty-txt="D" data-qwertz-txt="D" data-qwerty-bind="d scancode7" data-azerty-bind="d scancode7" data-qwertz-bind="d scancode7">D</div>
-                    <div class="key dyn-key" data-qwerty-txt="F" data-azerty-txt="F" data-qwertz-txt="F" data-qwerty-bind="f scancode9" data-azerty-bind="f scancode9" data-qwertz-bind="f scancode9">F</div>
-                    <div class="key dyn-key" data-qwerty-txt="G" data-azerty-txt="G" data-qwertz-txt="G" data-qwerty-bind="g scancode10" data-azerty-bind="g scancode10" data-qwertz-bind="g scancode10">G</div>
-                    <div class="key dyn-key" data-qwerty-txt="H" data-azerty-txt="H" data-qwertz-txt="H" data-qwerty-bind="h scancode11" data-azerty-bind="h scancode11" data-qwertz-bind="h scancode11">H</div>
-                    <div class="key dyn-key" data-qwerty-txt="J" data-azerty-txt="J" data-qwertz-txt="J" data-qwerty-bind="j scancode13" data-azerty-bind="j scancode13" data-qwertz-bind="j scancode13">J</div>
-                    <div class="key dyn-key" data-qwerty-txt="K" data-azerty-txt="K" data-qwertz-txt="K" data-qwerty-bind="k scancode14" data-azerty-bind="k scancode14" data-qwertz-bind="k scancode14">K</div>
-                    <div class="key dyn-key" data-qwerty-txt="L" data-azerty-txt="L" data-qwertz-txt="L" data-qwerty-bind="l scancode15" data-azerty-bind="l scancode15" data-qwertz-bind="l scancode15">L</div>
-                    <div class="key dyn-key" data-qwerty-txt="; :" data-azerty-txt="M" data-qwertz-txt="Ö" data-qwerty-bind=";" data-azerty-bind="m ; scancode51" data-qwertz-bind="ö ;">;</div>
-                    <div class="key dyn-key" data-qwerty-txt="' &quot;" data-azerty-txt="ù %" data-qwertz-txt="Ä" data-qwerty-bind="'" data-azerty-bind="ù '" data-qwertz-bind="ä '">'</div>
-                    <div class="key dyn-key" data-qwerty-txt="\ |" data-azerty-txt="* µ" data-qwertz-txt="# '" data-qwerty-bind="\" data-azerty-bind="* \" data-qwertz-bind="# \">\</div>
-                    <div class="key enter" data-key="enter return">Enter</div>
+                    <div class="key caps static-key" data-binds="caps capslock">Caps</div>
+                    <div class="key dyn-key" data-code="KeyA"></div>
+                    <div class="key dyn-key" data-code="KeyS"></div>
+                    <div class="key dyn-key" data-code="KeyD"></div>
+                    <div class="key dyn-key" data-code="KeyF"></div>
+                    <div class="key dyn-key" data-code="KeyG"></div>
+                    <div class="key dyn-key" data-code="KeyH"></div>
+                    <div class="key dyn-key" data-code="KeyJ"></div>
+                    <div class="key dyn-key" data-code="KeyK"></div>
+                    <div class="key dyn-key" data-code="KeyL"></div>
+                    <div class="key dyn-key" data-code="Semicolon"></div>
+                    <div class="key dyn-key" data-code="Quote"></div>
+                    <div class="key dyn-key" data-code="Backslash"></div>
+                    <div class="key enter static-key" data-binds="enter return">Enter</div>
                 </div>
                 <div class="row">
-                    <div class="key shift" data-key="shift">Shift</div>
-                    <div class="key dyn-key" data-qwerty-txt="< >" data-azerty-txt="< >" data-qwertz-txt="< >" data-qwerty-bind="<" data-azerty-bind="<" data-qwertz-bind="<"><</div>
-                    <div class="key dyn-key" data-qwerty-txt="Z" data-azerty-txt="W" data-qwertz-txt="Y" data-qwerty-bind="z scancode29" data-azerty-bind="w z scancode29" data-qwertz-bind="y z scancode29">Z</div>
-                    <div class="key dyn-key" data-qwerty-txt="X" data-azerty-txt="X" data-qwertz-txt="X" data-qwerty-bind="x scancode27" data-azerty-bind="x scancode27" data-qwertz-bind="x scancode27">X</div>
-                    <div class="key dyn-key" data-qwerty-txt="C" data-azerty-txt="C" data-qwertz-txt="C" data-qwerty-bind="c scancode6" data-azerty-bind="c scancode6" data-qwertz-bind="c scancode6">C</div>
-                    <div class="key dyn-key" data-qwerty-txt="V" data-azerty-txt="V" data-qwertz-txt="V" data-qwerty-bind="v scancode25" data-azerty-bind="v scancode25" data-qwertz-bind="v scancode25">V</div>
-                    <div class="key dyn-key" data-qwerty-txt="B" data-azerty-txt="B" data-qwertz-txt="B" data-qwerty-bind="b scancode5" data-azerty-bind="b scancode5" data-qwertz-bind="b scancode5">B</div>
-                    <div class="key dyn-key" data-qwerty-txt="N" data-azerty-txt="N" data-qwertz-txt="N" data-qwerty-bind="n scancode17" data-azerty-bind="n scancode17" data-qwertz-bind="n scancode17">N</div>
-                    <div class="key dyn-key" data-qwerty-txt="M" data-azerty-txt=", ?" data-qwertz-txt="M" data-qwerty-bind="m scancode16" data-azerty-bind=", m scancode16" data-qwertz-bind="m scancode16">M</div>
-                    <div class="key dyn-key" data-qwerty-txt=", <" data-azerty-txt="; ." data-qwertz-txt=", ;" data-qwerty-bind="," data-azerty-bind="; ," data-qwertz-bind=",">,</div>
-                    <div class="key dyn-key" data-qwerty-txt=". >" data-azerty-txt=": /" data-qwertz-txt=". :" data-qwerty-bind="." data-azerty-bind=": ." data-qwertz-bind=".">.</div>
-                    <div class="key dyn-key" data-qwerty-txt="/ ?" data-azerty-txt="! §" data-qwertz-txt="- _" data-qwerty-bind="/" data-azerty-bind="! /" data-qwertz-bind="- /">/</div>
-                    <div class="key shift" data-key="rshift">Shift</div>
+                    <div class="key shift static-key" data-binds="shift">Shift</div>
+                    <div class="key dyn-key" data-code="IntlBackslash"></div>
+                    <div class="key dyn-key" data-code="KeyZ"></div>
+                    <div class="key dyn-key" data-code="KeyX"></div>
+                    <div class="key dyn-key" data-code="KeyC"></div>
+                    <div class="key dyn-key" data-code="KeyV"></div>
+                    <div class="key dyn-key" data-code="KeyB"></div>
+                    <div class="key dyn-key" data-code="KeyN"></div>
+                    <div class="key dyn-key" data-code="KeyM"></div>
+                    <div class="key dyn-key" data-code="Comma"></div>
+                    <div class="key dyn-key" data-code="Period"></div>
+                    <div class="key dyn-key" data-code="Slash"></div>
+                    <div class="key shift static-key" data-binds="rshift">Shift</div>
                 </div>
                 <div class="row">
-                    <div class="key" data-key="ctrl">Ctrl</div>
-                    <div class="key" data-key="alt">Alt</div>
-                    <div class="key space" data-key="space">Space</div>
-                    <div class="key" data-key="altgr ralt">AltGr</div>
-                    <div class="key" data-key="rctrl">Ctrl</div>
+                    <div class="key static-key" data-binds="ctrl">Ctrl</div>
+                    <div class="key static-key" data-binds="alt">Alt</div>
+                    <div class="key space static-key" data-binds="space">Space</div>
+                    <div class="key static-key" data-binds="altgr ralt">AltGr</div>
+                    <div class="key static-key" data-binds="rctrl">Ctrl</div>
                 </div>
             </div>
         </div>
@@ -267,54 +259,54 @@
         <div>
             <div class="block" style="margin-bottom: 15px; margin-top: 65px;">
                 <div class="row">
-                    <div class="key" data-key="ins insert">Ins</div>
-                    <div class="key" data-key="home">Home</div>
-                    <div class="key" data-key="pgup">PgUp</div>
+                    <div class="key static-key" data-binds="ins insert">Ins</div>
+                    <div class="key static-key" data-binds="home">Home</div>
+                    <div class="key static-key" data-binds="pgup">PgUp</div>
                 </div>
                 <div class="row">
-                    <div class="key" data-key="del delete">Del</div>
-                    <div class="key" data-key="end">End</div>
-                    <div class="key" data-key="pgdn">PgDn</div>
+                    <div class="key static-key" data-binds="del delete">Del</div>
+                    <div class="key static-key" data-binds="end">End</div>
+                    <div class="key static-key" data-binds="pgdn">PgDn</div>
                 </div>
             </div>
 
             <div class="block">
                 <div class="row">
                     <div class="key hidden"></div>
-                    <div class="key" data-key="uparrow">▲</div>
+                    <div class="key static-key" data-binds="uparrow">▲</div>
                     <div class="key hidden"></div>
                 </div>
                 <div class="row">
-                    <div class="key" data-key="leftarrow">◀</div>
-                    <div class="key" data-key="downarrow">▼</div>
-                    <div class="key" data-key="rightarrow">▶</div>
+                    <div class="key static-key" data-binds="leftarrow">◀</div>
+                    <div class="key static-key" data-binds="downarrow">▼</div>
+                    <div class="key static-key" data-binds="rightarrow">▶</div>
                 </div>
             </div>
         </div>
 
         <div>
             <div class="numpad" style="margin-top: 65px;">
-                <div class="key" data-key="numlock">Num</div>
-                <div class="key" data-key="kp_slash kp_divide">/</div>
-                <div class="key" data-key="kp_multiply">*</div>
-                <div class="key" data-key="kp_minus">-</div>
+                <div class="key static-key" data-binds="numlock">Num</div>
+                <div class="key static-key" data-binds="kp_slash kp_divide">/</div>
+                <div class="key static-key" data-binds="kp_multiply">*</div>
+                <div class="key static-key" data-binds="kp_minus">-</div>
                 
-                <div class="key" data-key="kp_home kp_7">7</div>
-                <div class="key" data-key="kp_uparrow kp_8">8</div>
-                <div class="key" data-key="kp_pgup kp_9">9</div>
-                <div class="key tall" data-key="kp_plus">+</div>
+                <div class="key static-key" data-binds="kp_home kp_7">7</div>
+                <div class="key static-key" data-binds="kp_uparrow kp_8">8</div>
+                <div class="key static-key" data-binds="kp_pgup kp_9">9</div>
+                <div class="key tall static-key" data-binds="kp_plus">+</div>
                 
-                <div class="key" data-key="kp_leftarrow kp_4">4</div>
-                <div class="key" data-key="kp_5">5</div>
-                <div class="key" data-key="kp_rightarrow kp_6">6</div>
+                <div class="key static-key" data-binds="kp_leftarrow kp_4">4</div>
+                <div class="key static-key" data-binds="kp_5">5</div>
+                <div class="key static-key" data-binds="kp_rightarrow kp_6">6</div>
                 
-                <div class="key" data-key="kp_end kp_1">1</div>
-                <div class="key" data-key="kp_downarrow kp_2">2</div>
-                <div class="key" data-key="kp_pgdn kp_3">3</div>
-                <div class="key tall" data-key="kp_enter">Ent</div>
+                <div class="key static-key" data-binds="kp_end kp_1">1</div>
+                <div class="key static-key" data-binds="kp_downarrow kp_2">2</div>
+                <div class="key static-key" data-binds="kp_pgdn kp_3">3</div>
+                <div class="key tall static-key" data-binds="kp_enter">Ent</div>
                 
-                <div class="key wide" data-key="kp_ins kp_0">0</div>
-                <div class="key" data-key="kp_del kp_dot">.</div>
+                <div class="key wide static-key" data-binds="kp_ins kp_0">0</div>
+                <div class="key static-key" data-binds="kp_del kp_dot">.</div>
             </div>
         </div>
 
@@ -322,18 +314,18 @@
             <div class="block" style="margin-top: 65px;">
                 <div class="section-label">Mouse</div>
                 <div class="row">
-                    <div class="key" data-key="mouse4">M4</div>
-                    <div class="key" data-key="mwheelup">WU</div>
-                    <div class="key" data-key="mouse5">M5</div>
+                    <div class="key static-key" data-binds="mouse4">M4</div>
+                    <div class="key static-key" data-binds="mwheelup">WU</div>
+                    <div class="key static-key" data-binds="mouse5">M5</div>
                 </div>
                 <div class="row">
-                    <div class="key" data-key="mouse1">M1</div>
-                    <div class="key" data-key="mouse3">M3</div>
-                    <div class="key" data-key="mouse2">M2</div>
+                    <div class="key static-key" data-binds="mouse1">M1</div>
+                    <div class="key static-key" data-binds="mouse3">M3</div>
+                    <div class="key static-key" data-binds="mouse2">M2</div>
                 </div>
                 <div class="row">
                     <div class="key hidden"></div>
-                    <div class="key" data-key="mwheeldown">WD</div>
+                    <div class="key static-key" data-binds="mwheeldown">WD</div>
                     <div class="key hidden"></div>
                 </div>
             </div>
@@ -341,44 +333,153 @@
     </div>
 
     <script>
-        // DOM Elements
+        // --- 1. CS2 SCANCODE DATABASE ---
+        // These represent the physical hardware keys, CS2 understands these universally.
+        const scancodes = {
+            "Backquote": "scancode53", "Digit1": "scancode30", "Digit2": "scancode31", "Digit3": "scancode32", "Digit4": "scancode33", "Digit5": "scancode34", "Digit6": "scancode35", "Digit7": "scancode36", "Digit8": "scancode37", "Digit9": "scancode38", "Digit0": "scancode39", "Minus": "scancode45", "Equal": "scancode46",
+            "KeyQ": "scancode20", "KeyW": "scancode26", "KeyE": "scancode8", "KeyR": "scancode21", "KeyT": "scancode23", "KeyY": "scancode28", "KeyU": "scancode24", "KeyI": "scancode12", "KeyO": "scancode18", "KeyP": "scancode19", "BracketLeft": "scancode47", "BracketRight": "scancode48",
+            "KeyA": "scancode4", "KeyS": "scancode22", "KeyD": "scancode7", "KeyF": "scancode9", "KeyG": "scancode10", "KeyH": "scancode11", "KeyJ": "scancode13", "KeyK": "scancode14", "KeyL": "scancode15", "Semicolon": "scancode51", "Quote": "scancode52", "Backslash": "scancode49",
+            "IntlBackslash": "scancode100", "KeyZ": "scancode29", "KeyX": "scancode27", "KeyC": "scancode6", "KeyV": "scancode25", "KeyB": "scancode5", "KeyN": "scancode17", "KeyM": "scancode16", "Comma": "scancode54", "Period": "scancode55", "Slash": "scancode56"
+        };
+
+        // --- 2. LAYOUT DICTIONARY DATABASE ---
+        // Format: "KeyName": ["Display Text", "primary_char_bind", "secondary_char_bind"]
+        const layoutsDB = {
+            "qwerty_us": {
+                name: "QWERTY (US ANSI)",
+                keys: {
+                    "Backquote": ["~ `", "`", "~"], "Digit1": ["1 !", "1"], "Digit2": ["2 @", "2"], "Digit3": ["3 #", "3"], "Digit4": ["4 $", "4"], "Digit5": ["5 %", "5"], "Digit6": ["6 ^", "6"], "Digit7": ["7 &", "7"], "Digit8": ["8 *", "8"], "Digit9": ["9 (", "9"], "Digit0": ["0 )", "0"], "Minus": ["- _", "-"], "Equal": ["= +", "="],
+                    "KeyQ": ["Q", "q"], "KeyW": ["W", "w"], "KeyE": ["E", "e"], "KeyR": ["R", "r"], "KeyT": ["T", "t"], "KeyY": ["Y", "y"], "KeyU": ["U", "u"], "KeyI": ["I", "i"], "KeyO": ["O", "o"], "KeyP": ["P", "p"], "BracketLeft": ["[ {", "["], "BracketRight": ["] }", "]"],
+                    "KeyA": ["A", "a"], "KeyS": ["S", "s"], "KeyD": ["D", "d"], "KeyF": ["F", "f"], "KeyG": ["G", "g"], "KeyH": ["H", "h"], "KeyJ": ["J", "j"], "KeyK": ["K", "k"], "KeyL": ["L", "l"], "Semicolon": ["; :", ";"], "Quote": ["' \"", "'"], "Backslash": ["\\ |", "\\"],
+                    "IntlBackslash": ["< >", "<", ">"], "KeyZ": ["Z", "z"], "KeyX": ["X", "x"], "KeyC": ["C", "c"], "KeyV": ["V", "v"], "KeyB": ["B", "b"], "KeyN": ["N", "n"], "KeyM": ["M", "m"], "Comma": [", <", ","], "Period": [". >", "."], "Slash": ["/ ?", "/"]
+                }
+            },
+            "qwerty_uk": {
+                name: "QWERTY (UK ISO)",
+                keys: {
+                    "Backquote": ["` ¬", "`"], "Digit1": ["1 !", "1"], "Digit2": ["2 \"", "2"], "Digit3": ["3 £", "3"], "Digit4": ["4 $", "4"], "Digit5": ["5 %", "5"], "Digit6": ["6 ^", "6"], "Digit7": ["7 &", "7"], "Digit8": ["8 *", "8"], "Digit9": ["9 (", "9"], "Digit0": ["0 )", "0"], "Minus": ["- _", "-"], "Equal": ["= +", "="],
+                    "KeyQ": ["Q", "q"], "KeyW": ["W", "w"], "KeyE": ["E", "e"], "KeyR": ["R", "r"], "KeyT": ["T", "t"], "KeyY": ["Y", "y"], "KeyU": ["U", "u"], "KeyI": ["I", "i"], "KeyO": ["O", "o"], "KeyP": ["P", "p"], "BracketLeft": ["[ {", "["], "BracketRight": ["] }", "]"],
+                    "KeyA": ["A", "a"], "KeyS": ["S", "s"], "KeyD": ["D", "d"], "KeyF": ["F", "f"], "KeyG": ["G", "g"], "KeyH": ["H", "h"], "KeyJ": ["J", "j"], "KeyK": ["K", "k"], "KeyL": ["L", "l"], "Semicolon": ["; :", ";"], "Quote": ["' @", "'"], "Backslash": ["# ~", "#"],
+                    "IntlBackslash": ["\\ |", "\\"], "KeyZ": ["Z", "z"], "KeyX": ["X", "x"], "KeyC": ["C", "c"], "KeyV": ["V", "v"], "KeyB": ["B", "b"], "KeyN": ["N", "n"], "KeyM": ["M", "m"], "Comma": [", <", ","], "Period": [". >", "."], "Slash": ["/ ?", "/"]
+                }
+            },
+            "azerty_fr": {
+                name: "AZERTY (France)",
+                keys: {
+                    "Backquote": ["²", "²"], "Digit1": ["& 1", "1", "&"], "Digit2": ["é 2", "2", "é"], "Digit3": ["\" 3", "3", "\""], "Digit4": ["' 4", "4", "'"], "Digit5": ["( 5", "5", "("], "Digit6": ["- 6", "6", "-"], "Digit7": ["è 7", "7", "è"], "Digit8": ["_ 8", "8", "_"], "Digit9": ["ç 9", "9", "ç"], "Digit0": ["à 0", "0", "à"], "Minus": [") °", ")"], "Equal": ["= +", "="],
+                    "KeyQ": ["A", "a", "q"], "KeyW": ["Z", "z", "w"], "KeyE": ["E", "e"], "KeyR": ["R", "r"], "KeyT": ["T", "t"], "KeyY": ["Y", "y"], "KeyU": ["U", "u"], "KeyI": ["I", "i"], "KeyO": ["O", "o"], "KeyP": ["P", "p"], "BracketLeft": ["^ ¨", "^", "["], "BracketRight": ["$ £", "$", "]"],
+                    "KeyA": ["Q", "q", "a"], "KeyS": ["S", "s"], "KeyD": ["D", "d"], "KeyF": ["F", "f"], "KeyG": ["G", "g"], "KeyH": ["H", "h"], "KeyJ": ["J", "j"], "KeyK": ["K", "k"], "KeyL": ["L", "l"], "Semicolon": ["M", "m", ";"], "Quote": ["ù %", "ù", "'"], "Backslash": ["* µ", "*", "\\"],
+                    "IntlBackslash": ["< >", "<", ">"], "KeyZ": ["W", "w", "z"], "KeyX": ["X", "x"], "KeyC": ["C", "c"], "KeyV": ["V", "v"], "KeyB": ["B", "b"], "KeyN": ["N", "n"], "KeyM": [", ?", ","], "Comma": ["; .", ";"], "Period": [": /", ":"], "Slash": ["! §", "!"]
+                }
+            },
+            "azerty_be": {
+                name: "AZERTY (Belgium)",
+                keys: {
+                    "Backquote": ["² ³", "²"], "Digit1": ["& 1", "1", "&"], "Digit2": ["é 2", "2", "é"], "Digit3": ["\" 3", "3", "\""], "Digit4": ["' 4", "4", "'"], "Digit5": ["( 5", "5", "("], "Digit6": ["§ 6", "6", "§"], "Digit7": ["è 7", "7", "è"], "Digit8": ["! 8", "8", "!"], "Digit9": ["ç 9", "9", "ç"], "Digit0": ["à 0", "0", "à"], "Minus": [") °", ")"], "Equal": ["- _", "-"],
+                    "KeyQ": ["A", "a", "q"], "KeyW": ["Z", "z", "w"], "KeyE": ["E", "e"], "KeyR": ["R", "r"], "KeyT": ["T", "t"], "KeyY": ["Y", "y"], "KeyU": ["U", "u"], "KeyI": ["I", "i"], "KeyO": ["O", "o"], "KeyP": ["P", "p"], "BracketLeft": ["^ ¨", "^", "["], "BracketRight": ["$ *", "$", "]"],
+                    "KeyA": ["Q", "q", "a"], "KeyS": ["S", "s"], "KeyD": ["D", "d"], "KeyF": ["F", "f"], "KeyG": ["G", "g"], "KeyH": ["H", "h"], "KeyJ": ["J", "j"], "KeyK": ["K", "k"], "KeyL": ["L", "l"], "Semicolon": ["M", "m", ";"], "Quote": ["ù %", "ù", "'"], "Backslash": ["µ £", "µ", "\\"],
+                    "IntlBackslash": ["< >", "<", ">"], "KeyZ": ["W", "w", "z"], "KeyX": ["X", "x"], "KeyC": ["C", "c"], "KeyV": ["V", "v"], "KeyB": ["B", "b"], "KeyN": ["N", "n"], "KeyM": [", ?", ","], "Comma": ["; .", ";"], "Period": [": /", ":"], "Slash": ["= +", "="]
+                }
+            },
+            "qwertz_de": {
+                name: "QWERTZ (Germany)",
+                keys: {
+                    "Backquote": ["^ °", "^"], "Digit1": ["1 !", "1"], "Digit2": ["2 \"", "2"], "Digit3": ["3 §", "3"], "Digit4": ["4 $", "4"], "Digit5": ["5 %", "5"], "Digit6": ["6 &", "6"], "Digit7": ["7 /", "7"], "Digit8": ["8 (", "8"], "Digit9": ["9 )", "9"], "Digit0": ["0 =", "0"], "Minus": ["ß ?", "ß"], "Equal": ["´ `", "´"],
+                    "KeyQ": ["Q", "q"], "KeyW": ["W", "w"], "KeyE": ["E", "e"], "KeyR": ["R", "r"], "KeyT": ["T", "t"], "KeyY": ["Z", "z", "y"], "KeyU": ["U", "u"], "KeyI": ["I", "i"], "KeyO": ["O", "o"], "KeyP": ["P", "p"], "BracketLeft": ["Ü", "ü", "["], "BracketRight": ["+ *", "+", "]"],
+                    "KeyA": ["A", "a"], "KeyS": ["S", "s"], "KeyD": ["D", "d"], "KeyF": ["F", "f"], "KeyG": ["G", "g"], "KeyH": ["H", "h"], "KeyJ": ["J", "j"], "KeyK": ["K", "k"], "KeyL": ["L", "l"], "Semicolon": ["Ö", "ö", ";"], "Quote": ["Ä", "ä", "'"], "Backslash": ["# '", "#", "\\"],
+                    "IntlBackslash": ["< >", "<", ">"], "KeyZ": ["Y", "y", "z"], "KeyX": ["X", "x"], "KeyC": ["C", "c"], "KeyV": ["V", "v"], "KeyB": ["B", "b"], "KeyN": ["N", "n"], "KeyM": ["M", "m"], "Comma": [", ;", ","], "Period": [". :", "."], "Slash": ["- _", "-"]
+                }
+            },
+            "qwerty_es": {
+                name: "QWERTY (Spanish)",
+                keys: {
+                    "Backquote": ["º ª", "º"], "Digit1": ["1 !", "1"], "Digit2": ["2 \"", "2"], "Digit3": ["3 ·", "3"], "Digit4": ["4 $", "4"], "Digit5": ["5 %", "5"], "Digit6": ["6 &", "6"], "Digit7": ["7 /", "7"], "Digit8": ["8 (", "8"], "Digit9": ["9 )", "9"], "Digit0": ["0 =", "0"], "Minus": ["' ?", "'"], "Equal": ["¡ ¿", "¡"],
+                    "KeyQ": ["Q", "q"], "KeyW": ["W", "w"], "KeyE": ["E", "e"], "KeyR": ["R", "r"], "KeyT": ["T", "t"], "KeyY": ["Y", "y"], "KeyU": ["U", "u"], "KeyI": ["I", "i"], "KeyO": ["O", "o"], "KeyP": ["P", "p"], "BracketLeft": ["` ^", "`", "["], "BracketRight": ["+ *", "+", "]"],
+                    "KeyA": ["A", "a"], "KeyS": ["S", "s"], "KeyD": ["D", "d"], "KeyF": ["F", "f"], "KeyG": ["G", "g"], "KeyH": ["H", "h"], "KeyJ": ["J", "j"], "KeyK": ["K", "k"], "KeyL": ["L", "l"], "Semicolon": ["Ñ", "ñ", ";"], "Quote": ["´ ¨", "´", "'"], "Backslash": ["ç Ç", "ç", "\\"],
+                    "IntlBackslash": ["< >", "<", ">"], "KeyZ": ["Z", "z"], "KeyX": ["X", "x"], "KeyC": ["C", "c"], "KeyV": ["V", "v"], "KeyB": ["B", "b"], "KeyN": ["N", "n"], "KeyM": ["M", "m"], "Comma": [", ;", ","], "Period": [". :", "."], "Slash": ["- _", "-"]
+                }
+            },
+            "qwerty_nordic": {
+                name: "QWERTY (Nordic ISO)",
+                keys: {
+                    "Backquote": ["§ ½", "§"], "Digit1": ["1 !", "1"], "Digit2": ["2 \"", "2"], "Digit3": ["3 #", "3"], "Digit4": ["4 ¤", "4"], "Digit5": ["5 %", "5"], "Digit6": ["6 &", "6"], "Digit7": ["7 /", "7"], "Digit8": ["8 (", "8"], "Digit9": ["9 )", "9"], "Digit0": ["0 =", "0"], "Minus": ["+ ?", "+"], "Equal": ["´ `", "´"],
+                    "KeyQ": ["Q", "q"], "KeyW": ["W", "w"], "KeyE": ["E", "e"], "KeyR": ["R", "r"], "KeyT": ["T", "t"], "KeyY": ["Y", "y"], "KeyU": ["U", "u"], "KeyI": ["I", "i"], "KeyO": ["O", "o"], "KeyP": ["P", "p"], "BracketLeft": ["Å", "å", "["], "BracketRight": ["¨ ^", "¨", "]"],
+                    "KeyA": ["A", "a"], "KeyS": ["S", "s"], "KeyD": ["D", "d"], "KeyF": ["F", "f"], "KeyG": ["G", "g"], "KeyH": ["H", "h"], "KeyJ": ["J", "j"], "KeyK": ["K", "k"], "KeyL": ["L", "l"], "Semicolon": ["Ö Æ", "ö", "æ", ";"], "Quote": ["Ä Ø", "ä", "ø", "'"], "Backslash": ["' *", "'", "\\"],
+                    "IntlBackslash": ["< >", "<", ">"], "KeyZ": ["Z", "z"], "KeyX": ["X", "x"], "KeyC": ["C", "c"], "KeyV": ["V", "v"], "KeyB": ["B", "b"], "KeyN": ["N", "n"], "KeyM": ["M", "m"], "Comma": [", ;", ","], "Period": [". :", "."], "Slash": ["- _", "-"]
+                }
+            },
+            "dvorak": {
+                name: "Dvorak",
+                keys: {
+                    "Backquote": ["` ~", "`"], "Digit1": ["1 !", "1"], "Digit2": ["2 @", "2"], "Digit3": ["3 #", "3"], "Digit4": ["4 $", "4"], "Digit5": ["5 %", "5"], "Digit6": ["6 ^", "6"], "Digit7": ["7 &", "7"], "Digit8": ["8 *", "8"], "Digit9": ["9 (", "9"], "Digit0": ["0 )", "0"], "Minus": ["[ {", "["], "Equal": ["] }", "]"],
+                    "KeyQ": ["' \"", "'"], "KeyW": [", <", ","], "KeyE": [". >", "."], "KeyR": ["P", "p"], "KeyT": ["Y", "y"], "KeyY": ["F", "f"], "KeyU": ["G", "g"], "KeyI": ["C", "c"], "KeyO": ["R", "r"], "KeyP": ["L", "l"], "BracketLeft": ["/ ?", "/"], "BracketRight": ["= +", "="],
+                    "KeyA": ["A", "a"], "KeyS": ["O", "o"], "KeyD": ["E", "e"], "KeyF": ["U", "u"], "KeyG": ["I", "i"], "KeyH": ["D", "d"], "KeyJ": ["H", "h"], "KeyK": ["T", "t"], "KeyL": ["N", "n"], "Semicolon": ["S", "s"], "Quote": ["- _", "-"], "Backslash": ["\\ |", "\\"],
+                    "IntlBackslash": ["< >", "<", ">"], "KeyZ": ["; :", ";"], "KeyX": ["Q", "q"], "KeyC": ["J", "j"], "KeyV": ["K", "k"], "KeyB": ["X", "x"], "KeyN": ["B", "b"], "KeyM": ["M", "m"], "Comma": ["W", "w"], "Period": ["V", "v"], "Slash": ["Z", "z"]
+                }
+            },
+            "colemak": {
+                name: "Colemak",
+                keys: {
+                    "Backquote": ["` ~", "`"], "Digit1": ["1 !", "1"], "Digit2": ["2 @", "2"], "Digit3": ["3 #", "3"], "Digit4": ["4 $", "4"], "Digit5": ["5 %", "5"], "Digit6": ["6 ^", "6"], "Digit7": ["7 &", "7"], "Digit8": ["8 *", "8"], "Digit9": ["9 (", "9"], "Digit0": ["0 )", "0"], "Minus": ["- _", "-"], "Equal": ["= +", "="],
+                    "KeyQ": ["Q", "q"], "KeyW": ["W", "w"], "KeyE": ["F", "f"], "KeyR": ["P", "p"], "KeyT": ["G", "g"], "KeyY": ["J", "j"], "KeyU": ["L", "l"], "KeyI": ["U", "u"], "KeyO": ["Y", "y"], "KeyP": ["; :", ";"], "BracketLeft": ["[ {", "["], "BracketRight": ["] }", "]"],
+                    "KeyA": ["A", "a"], "KeyS": ["R", "r"], "KeyD": ["S", "s"], "KeyF": ["T", "t"], "KeyG": ["D", "d"], "KeyH": ["H", "h"], "KeyJ": ["N", "n"], "KeyK": ["E", "e"], "KeyL": ["I", "i"], "Semicolon": ["O", "o"], "Quote": ["' \"", "'"], "Backslash": ["\\ |", "\\"],
+                    "IntlBackslash": ["< >", "<", ">"], "KeyZ": ["Z", "z"], "KeyX": ["X", "x"], "KeyC": ["C", "c"], "KeyV": ["V", "v"], "KeyB": ["B", "b"], "KeyN": ["K", "k"], "KeyM": ["M", "m"], "Comma": [", <", ","], "Period": [". >", "."], "Slash": ["/ ?", "/"]
+                }
+            },
+            "workman": {
+                name: "Workman",
+                keys: {
+                    "Backquote": ["` ~", "`"], "Digit1": ["1 !", "1"], "Digit2": ["2 @", "2"], "Digit3": ["3 #", "3"], "Digit4": ["4 $", "4"], "Digit5": ["5 %", "5"], "Digit6": ["6 ^", "6"], "Digit7": ["7 &", "7"], "Digit8": ["8 *", "8"], "Digit9": ["9 (", "9"], "Digit0": ["0 )", "0"], "Minus": ["- _", "-"], "Equal": ["= +", "="],
+                    "KeyQ": ["Q", "q"], "KeyW": ["D", "d"], "KeyE": ["R", "r"], "KeyR": ["W", "w"], "KeyT": ["B", "b"], "KeyY": ["J", "j"], "KeyU": ["F", "f"], "KeyI": ["U", "u"], "KeyO": ["P", "p"], "KeyP": ["; :", ";"], "BracketLeft": ["[ {", "["], "BracketRight": ["] }", "]"],
+                    "KeyA": ["A", "a"], "KeyS": ["S", "s"], "KeyD": ["H", "h"], "KeyF": ["T", "t"], "KeyG": ["G", "g"], "KeyH": ["Y", "y"], "KeyJ": ["N", "n"], "KeyK": ["E", "e"], "KeyL": ["O", "o"], "Semicolon": ["I", "i"], "Quote": ["' \"", "'"], "Backslash": ["\\ |", "\\"],
+                    "IntlBackslash": ["< >", "<", ">"], "KeyZ": ["Z", "z"], "KeyX": ["X", "x"], "KeyC": ["M", "m"], "KeyV": ["C", "c"], "KeyB": ["V", "v"], "KeyN": ["K", "k"], "KeyM": ["L", "l"], "Comma": [", <", ","], "Period": [". >", "."], "Slash": ["/ ?", "/"]
+                }
+            }
+        };
+
+        // --- 3. APPLICATION LOGIC ---
         const cfgInput = document.getElementById('cfgInput');
         const layoutSwitch = document.getElementById('layoutSwitch');
         const tooltip = document.getElementById('tooltip');
-        const keys = document.querySelectorAll('.key');
-        
-        // App State
         let binds = {}; 
-        let currentLayout = 'qwerty';
 
-        // Initialize view on load
+        // Populate Layout Dropdown
+        for (const [key, layout] of Object.entries(layoutsDB)) {
+            const option = document.createElement('option');
+            option.value = key;
+            option.text = layout.name;
+            if (key === 'qwerty_us') option.selected = true;
+            layoutSwitch.appendChild(option);
+        }
+
+        // Initialize view
         updateKeyboardVisuals();
+        setupTooltips();
 
-        // 1. Tooltips events setup
-        keys.forEach(keyElement => {
-            keyElement.addEventListener('mouseenter', (e) => {
-                const activeKey = keyElement.getAttribute('data-active-bind');
-                if (keyElement.classList.contains('bound') && activeKey && binds[activeKey]) {
-                    tooltip.style.display = 'block';
-                    tooltip.innerText = `bind "${activeKey}" "${binds[activeKey]}"`;
-                }
+        // Handle tooltips
+        function setupTooltips() {
+            document.querySelectorAll('.key').forEach(keyElement => {
+                keyElement.addEventListener('mouseenter', (e) => {
+                    const activeKey = keyElement.getAttribute('data-active-bind');
+                    if (keyElement.classList.contains('bound') && activeKey && binds[activeKey]) {
+                        tooltip.style.display = 'block';
+                        tooltip.innerText = `bind "${activeKey}" "${binds[activeKey]}"`;
+                    }
+                });
+                keyElement.addEventListener('mousemove', (e) => {
+                    tooltip.style.left = e.clientX + 15 + 'px';
+                    tooltip.style.top = e.clientY + 15 + 'px';
+                });
+                keyElement.addEventListener('mouseleave', () => {
+                    tooltip.style.display = 'none';
+                });
             });
-            
-            keyElement.addEventListener('mousemove', (e) => {
-                tooltip.style.left = e.clientX + 15 + 'px';
-                tooltip.style.top = e.clientY + 15 + 'px';
-            });
-            
-            keyElement.addEventListener('mouseleave', () => {
-                tooltip.style.display = 'none';
-            });
-        });
+        }
 
-        // 2. File Upload Handler
+        // Handle File Upload
         cfgInput.addEventListener('change', function(event) {
             const file = event.target.files[0];
             if (!file) return;
-
             const reader = new FileReader();
             reader.onload = function(e) {
                 parseCFG(e.target.result);
@@ -387,67 +488,75 @@
             reader.readAsText(file);
         });
 
-        // 3. Layout Switcher Handler
-        layoutSwitch.addEventListener('change', function(e) {
-            currentLayout = e.target.value;
+        // Handle Layout Switch
+        layoutSwitch.addEventListener('change', function() {
             updateKeyboardVisuals();
             updateKeyboardBinds();
         });
 
-        // 4. Update Key Visual Texts Based on Layout
+        // Update Key Faces
         function updateKeyboardVisuals() {
+            const currentLayout = layoutSwitch.value;
+            const db = layoutsDB[currentLayout].keys;
+
             document.querySelectorAll('.dyn-key').forEach(key => {
-                // Fetch the text for the currently selected layout (e.g., data-qwerty-txt)
-                const layoutText = key.getAttribute(`data-${currentLayout}-txt`);
-                if (layoutText) {
-                    key.innerText = layoutText;
+                const code = key.getAttribute('data-code');
+                if (db[code]) {
+                    key.innerText = db[code][0]; // First item is the display text
+                } else {
+                    key.innerText = "";
                 }
             });
         }
 
-        // 5. CFG Parser Logic
+        // Parse CS2 CFG (with scancode awareness)
         function parseCFG(text) {
             binds = {}; 
             const lines = text.split('\n');
-            
             for (let line of lines) {
-                // Strip inline comments (//) and trim trailing spaces
                 line = line.split('//')[0].trim();
                 if (!line) continue;
-
-                // Regex matching standard Source Engine bind commands
                 const match = line.match(/^bind\s+"?([^"\s]+)"?\s+"?(.*?)"?$/i);
                 if (match) {
-                    let key = match[1].toLowerCase();
-                    let action = match[2];
-                    binds[key] = action;
+                    binds[match[1].toLowerCase()] = match[2];
                 }
             }
         }
 
-        // 6. Map Parsed Binds to the UI Grid
+        // Map Binds to UI
         function updateKeyboardBinds() {
-            keys.forEach(keyElement => {
-                // Reset states
+            const currentLayout = layoutSwitch.value;
+            const db = layoutsDB[currentLayout].keys;
+
+            document.querySelectorAll('.key').forEach(keyElement => {
                 keyElement.classList.remove('bound');
                 keyElement.removeAttribute('data-active-bind');
 
-                // Determine which bind string to check based on layout and element type
-                let bindString = "";
+                let possibleBinds = [];
+
                 if (keyElement.classList.contains('dyn-key')) {
-                    bindString = keyElement.getAttribute(`data-${currentLayout}-bind`);
+                    const code = keyElement.getAttribute('data-code');
+                    // Add physical hardware scancode
+                    if (scancodes[code]) possibleBinds.push(scancodes[code]);
+                    
+                    // Add all possible text character mappings for this layout
+                    if (db[code]) {
+                        // Slice from index 1 to end (ignoring display text at index 0)
+                        possibleBinds = possibleBinds.concat(db[code].slice(1)); 
+                    }
                 } else {
-                    bindString = keyElement.getAttribute('data-key');
+                    // Static keys (F-keys, Numpad, Mouse)
+                    const staticBinds = keyElement.getAttribute('data-binds');
+                    if (staticBinds) {
+                        possibleBinds = possibleBinds.concat(staticBinds.split(' '));
+                    }
                 }
 
-                if (!bindString) return;
-
-                // Iterate over possible aliases for the physical key
-                const possibleKeyNames = bindString.split(' '); 
-                for (let keyName of possibleKeyNames) {
+                // Check if any of our possible names exist in the user's CFG
+                for (let keyName of possibleBinds) {
                     if (binds[keyName]) {
                         keyElement.classList.add('bound');
-                        keyElement.setAttribute('data-active-bind', keyName); // Store matched name for tooltip
+                        keyElement.setAttribute('data-active-bind', keyName);
                         break; 
                     }
                 }
