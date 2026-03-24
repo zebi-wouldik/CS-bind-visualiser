@@ -175,6 +175,12 @@
         .modal-buttons { display: flex; gap: 10px; justify-content: flex-end; margin-top: 10px; }
         .btn-save-bind { background-color: #a6e3a1 !important; color: #11111b !important; }
         .btn-unbind { background-color: #f38ba8 !important; color: #11111b !important; margin-right: auto; }
+
+        /* Compare Copy Button */
+        #compareQuickActions { display: none; margin-bottom: 5px; }
+        #btnCopyFromOther { width: 100%; background-color: #89b4fa; color: #11111b; font-size: 13px; padding: 10px; border-radius: 4px; transition: background-color 0.2s; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+        #btnCopyFromOther:hover { background-color: #74c7ec; }
+
     </style>
 </head>
 <body>
@@ -232,6 +238,11 @@
             <h3 id="modalTitle">Edit Bind</h3>
             <p id="modalKeyInfo"></p>
             <p id="modalPaneInfo" style="color: #f9e2af; font-weight: bold; margin-bottom: 5px;"></p>
+            
+            <div id="compareQuickActions">
+                <button id="btnCopyFromOther">⏬ Copy from other config</button>
+            </div>
+
             <input type="text" id="modalBindInput" placeholder="e.g. +jump">
             <div class="modal-buttons">
                 <button id="btnUnbind" class="btn-unbind">Unbind</button>
@@ -374,7 +385,7 @@
                 const file = e.target.files[0];
                 if (!file) return;
                 state[paneKey].fileName = file.name;
-                document.getElementById(`title${paneKey}`).innerText = file.name; // Update displayed title
+                document.getElementById(`title${paneKey}`).innerText = file.name; 
                 const reader = new FileReader();
                 reader.onload = (e) => {
                     editor.value = e.target.result;
@@ -432,7 +443,6 @@
         function updateAllVisuals() {
             const layoutObj = layoutsDB[layoutSwitch.value];
             
-            // Adjust Physical Layout shape for both keyboards
             ['A', 'B'].forEach(pane => {
                 const mk = document.querySelector(`#kbWrap${pane} .main-keyboard`);
                 if (layoutObj.type === 'iso') {
@@ -441,7 +451,6 @@
                     mk.classList.remove('layout-iso'); mk.classList.add('layout-ansi');
                 }
                 
-                // Set character text
                 document.querySelectorAll(`#kbWrap${pane} .dyn-key`).forEach(key => {
                     const code = key.getAttribute('data-code');
                     key.innerText = layoutObj.keys[code] ? layoutObj.keys[code][0] : "";
@@ -459,7 +468,6 @@
                 const kbWrap = document.getElementById(state[paneKey].kbId);
 
                 kbWrap.querySelectorAll('.key').forEach(keyElement => {
-                    // Reset
                     keyElement.className = keyElement.className.replace(/bound|diff-added|diff-conflict|diff-missing|diff-match/g, '').trim();
                     keyElement.removeAttribute('data-active-bind');
                     keyElement.removeAttribute('data-other-val');
@@ -545,6 +553,8 @@
         // --- MODAL EDITING LOGIC ---
         const modalOverlay = document.getElementById('bindModalOverlay');
         const modalBindInput = document.getElementById('modalBindInput');
+        const compareQuickActions = document.getElementById('compareQuickActions');
+        const btnCopyFromOther = document.getElementById('btnCopyFromOther');
         let currentEditingContext = null;
 
         document.querySelectorAll('.keyboard-wrapper').forEach(wrapper => {
@@ -554,6 +564,7 @@
                 
                 tooltip.style.display = 'none';
                 const paneKey = wrapper.id === 'kbWrapA' ? 'A' : 'B';
+                const otherPaneKey = paneKey === 'A' ? 'B' : 'A';
                 currentEditingContext = { keyElement, paneKey };
                 
                 let primaryName = "";
@@ -567,10 +578,36 @@
 
                 document.getElementById('modalTitle').innerText = `Edit Key: ${primaryName.toUpperCase()}`;
                 document.getElementById('modalKeyInfo').innerText = `Engine Code: "${primaryName}"`;
-                document.getElementById('modalPaneInfo').innerText = `Modifying: ${state[paneKey].fileName}`; // Update displayed filename
+                document.getElementById('modalPaneInfo').innerText = `Modifying: ${state[paneKey].fileName}`; 
 
                 const myVal = state[paneKey].binds[primaryName] || keyElement.getAttribute('data-active-bind') && state[paneKey].binds[keyElement.getAttribute('data-active-bind')];
                 modalBindInput.value = myVal || '';
+
+                // Check for "Copy from other config" eligibility
+                if (state.compareMode) {
+                    let otherVal = null;
+                    const possibleBinds = getPossibleBindNames(keyElement);
+                    for (let name of possibleBinds) {
+                        if (state[otherPaneKey].binds[name.toLowerCase()]) {
+                            otherVal = state[otherPaneKey].binds[name.toLowerCase()];
+                            break;
+                        }
+                    }
+                    
+                    if (otherVal) {
+                        compareQuickActions.style.display = 'block';
+                        btnCopyFromOther.innerText = `⏬ Copy from ${state[otherPaneKey].fileName} ("${otherVal}")`;
+                        btnCopyFromOther.onclick = (event) => {
+                            event.preventDefault();
+                            modalBindInput.value = otherVal;
+                            document.getElementById('btnSave').click(); // Auto-save on click
+                        };
+                    } else {
+                        compareQuickActions.style.display = 'none';
+                    }
+                } else {
+                    compareQuickActions.style.display = 'none';
+                }
                 
                 modalOverlay.style.display = 'flex';
                 modalBindInput.focus();
