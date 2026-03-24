@@ -1,2 +1,2 @@
 # CS-bind-visualiser
-Visualise your CS keybinds
+Visualise and edit your CS keybinds
