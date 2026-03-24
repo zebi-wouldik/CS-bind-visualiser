@@ -59,6 +59,8 @@
 
         /* --- DUAL PANE LAYOUT --- */
         .split-view { display: flex; gap: 30px; flex-wrap: wrap; }
+        .split-view.layout-row { flex-wrap: nowrap; overflow-x: auto; padding-bottom: 15px; }
+        .split-view.layout-col { flex-direction: column; }
         .pane {
             flex: 1; min-width: 900px; background-color: #181825; border: 2px solid #313244;
             border-radius: 12px; padding: 20px; display: flex; flex-direction: column; gap: 20px; transition: all 0.3s ease;
@@ -112,6 +114,7 @@
         .commands-section { background-color: #11111b; border: 1px solid #45475a; border-radius: 8px; padding: 15px; }
         .commands-header { display: flex; justify-content: space-between; align-items: center; border-bottom: 1px solid #313244; padding-bottom: 10px; margin-bottom: 10px; }
         .commands-header h4 { margin: 0; color: #cdd6f4; }
+        .cmd-legend { display: none; gap: 15px; font-size: 12px; margin-bottom: 10px; justify-content: center; background-color: #181825; padding: 8px; border-radius: 4px; border: 1px solid #313244; }
         .cmd-list { max-height: 250px; overflow-y: auto; display: flex; flex-direction: column; gap: 6px; padding-right: 5px; }
         .cmd-item { 
             display: flex; justify-content: space-between; padding: 8px 12px; background-color: #181825; 
@@ -167,7 +170,7 @@
         .btn-copy-from-other:hover { background-color: #74c7ec; }
 
         /* Custom Scrollbar for lists */
-        ::-webkit-scrollbar { width: 8px; }
+        ::-webkit-scrollbar { width: 8px; height: 8px; }
         ::-webkit-scrollbar-track { background: #11111b; border-radius: 4px; }
         ::-webkit-scrollbar-thumb { background: #45475a; border-radius: 4px; }
         ::-webkit-scrollbar-thumb:hover { background: #585b70; }
@@ -181,6 +184,14 @@
         <div class="control-group">
             <label for="layoutSwitch"><strong>Base Keyboard Layout</strong></label>
             <select id="layoutSwitch"></select>
+        </div>
+        <div class="control-group" style="margin-left: 20px;">
+            <label for="viewLayoutSwitch"><strong>Display Layout</strong></label>
+            <select id="viewLayoutSwitch">
+                <option value="wrap">Responsive (Auto)</option>
+                <option value="row">Side-by-Side (Left/Right)</option>
+                <option value="column">Stacked (Top/Bottom)</option>
+            </select>
         </div>
         <div class="control-group" style="margin-left: auto;">
             <label><strong>Config Comparator</strong></label>
@@ -200,7 +211,7 @@
     <div class="split-view">
         <div class="pane" id="paneA">
             <div class="pane-header">
-                <h3 id="titleA">config_A.cfg</h3>
+                <h3 id="titleA">Base (A): config_A.cfg</h3>
                 <div class="pane-actions">
                     <input type="file" id="uploadA" accept=".cfg,.txt">
                     <button class="btn-download" id="downloadA">Export File</button>
@@ -214,6 +225,12 @@
                     <h4>Variables & Commands</h4>
                     <button class="btn-add" onclick="openCmdModal('A', '', '', '')">+ Add Command</button>
                 </div>
+                <div class="cmd-legend">
+                    <span style="color: #89b4fa; font-weight: bold;">■ Match</span>
+                    <span style="color: #f9e2af; font-weight: bold;">■ Different Value</span>
+                    <span style="color: #a6e3a1; font-weight: bold;">■ Exists Only Here</span>
+                    <span style="color: #f38ba8; font-weight: bold;">■ Missing Here</span>
+                </div>
                 <div class="cmd-list" id="cmdListA"></div>
             </div>
 
@@ -222,7 +239,7 @@
 
         <div class="pane" id="paneB">
             <div class="pane-header">
-                <h3 id="titleB">config_B.cfg</h3>
+                <h3 id="titleB">Compare (B): config_B.cfg</h3>
                 <div class="pane-actions">
                     <input type="file" id="uploadB" accept=".cfg,.txt">
                     <button class="btn-download" id="downloadB">Export File</button>
@@ -235,6 +252,12 @@
                 <div class="commands-header">
                     <h4>Variables & Commands</h4>
                     <button class="btn-add" onclick="openCmdModal('B', '', '', '')">+ Add Command</button>
+                </div>
+                <div class="cmd-legend">
+                    <span style="color: #89b4fa; font-weight: bold;">■ Match</span>
+                    <span style="color: #f9e2af; font-weight: bold;">■ Different Value</span>
+                    <span style="color: #a6e3a1; font-weight: bold;">■ Exists Only Here</span>
+                    <span style="color: #f38ba8; font-weight: bold;">■ Missing Here</span>
                 </div>
                 <div class="cmd-list" id="cmdListB"></div>
             </div>
@@ -364,6 +387,7 @@
 
         // --- DOM ELEMENTS ---
         const layoutSwitch = document.getElementById('layoutSwitch');
+        const viewLayoutSwitch = document.getElementById('viewLayoutSwitch');
         const btnToggleCompare = document.getElementById('btnToggleCompare');
         const legendContainer = document.getElementById('legendContainer');
         const tooltip = document.getElementById('tooltip');
@@ -390,15 +414,24 @@
         // --- EVENT LISTENERS ---
         layoutSwitch.addEventListener('change', updateAllVisuals);
         
+        viewLayoutSwitch.addEventListener('change', (e) => {
+            const splitView = document.querySelector('.split-view');
+            splitView.classList.remove('layout-row', 'layout-col');
+            if (e.target.value === 'row') splitView.classList.add('layout-row');
+            if (e.target.value === 'column') splitView.classList.add('layout-col');
+        });
+
         btnToggleCompare.addEventListener('click', () => {
             state.compareMode = !state.compareMode;
             if (state.compareMode) {
                 paneB.style.display = 'flex';
                 legendContainer.style.display = 'flex';
+                document.querySelectorAll('.cmd-legend').forEach(el => el.style.display = 'flex');
                 btnToggleCompare.innerText = "Disable Compare Mode";
             } else {
                 paneB.style.display = 'none';
                 legendContainer.style.display = 'none';
+                document.querySelectorAll('.cmd-legend').forEach(el => el.style.display = 'none');
                 btnToggleCompare.innerText = "Enable Compare Mode";
             }
             updateAllVisuals();
@@ -414,7 +447,11 @@
                 const file = e.target.files[0];
                 if (!file) return;
                 state[paneKey].fileName = file.name;
-                document.getElementById(`title${paneKey}`).innerText = file.name; 
+                
+                // Set explicit name to differentiate
+                const prefix = paneKey === 'A' ? 'Base (A): ' : 'Compare (B): ';
+                document.getElementById(`title${paneKey}`).innerText = prefix + file.name; 
+                
                 const reader = new FileReader();
                 reader.onload = (e) => {
                     editor.value = e.target.result;
@@ -633,9 +670,9 @@
                     else tooltip.innerText = `(Click to bind)`;
                 } else {
                     let text = `Key: "${activeName || getPossibleBindNames(keyElement)[0]}"\n\n`;
-                    text += `${state[paneKey].fileName}: ${myVal ? `"${myVal}"` : "[Unassigned]"}\n`;
-                    text += `${state[otherPaneKey].fileName}: ${otherVal ? `"${otherVal}"` : "[Unassigned]"}\n\n`;
-                    text += `(Click to edit ${state[paneKey].fileName})`;
+                    text += `${paneKey === 'A' ? 'Base (A)' : 'Compare (B)'} - ${state[paneKey].fileName}: ${myVal ? `"${myVal}"` : "[Unassigned]"}\n`;
+                    text += `${otherPaneKey === 'A' ? 'Base (A)' : 'Compare (B)'} - ${state[otherPaneKey].fileName}: ${otherVal ? `"${otherVal}"` : "[Unassigned]"}\n\n`;
+                    text += `(Click to edit ${paneKey === 'A' ? 'Base (A)' : 'Compare (B)'})`;
                     tooltip.innerText = text;
                 }
             });
@@ -663,7 +700,9 @@
 
                 document.getElementById('bindModalTitle').innerText = `Edit Key: ${primaryName.toUpperCase()}`;
                 document.getElementById('bindModalKeyInfo').innerText = `Engine Code: "${primaryName}"`;
-                document.getElementById('bindModalPaneInfo').innerText = `Modifying: ${state[paneKey].fileName}`; 
+                
+                const prefix = paneKey === 'A' ? 'Base (A): ' : 'Compare (B): ';
+                document.getElementById('bindModalPaneInfo').innerText = `Modifying: ${prefix}${state[paneKey].fileName}`; 
 
                 const inputEl = document.getElementById('bindModalInput');
                 inputEl.value = state[paneKey].binds[primaryName] || keyElement.getAttribute('data-active-bind') && state[paneKey].binds[keyElement.getAttribute('data-active-bind')] || '';
@@ -678,7 +717,7 @@
                     }
                     if (otherVal) {
                         qActions.style.display = 'block';
-                        btnCopy.innerText = `⏬ Copy from ${state[otherPaneKey].fileName} ("${otherVal}")`;
+                        btnCopy.innerText = `⏬ Copy from ${otherPaneKey === 'A' ? 'Base' : 'Compare'} ("${otherVal}")`;
                         btnCopy.onclick = (event) => { event.preventDefault(); inputEl.value = otherVal; document.getElementById('btnBindSave').click(); };
                     } else { qActions.style.display = 'none'; }
                 } else { qActions.style.display = 'none'; }
@@ -694,7 +733,8 @@
             const otherPaneKey = paneKey === 'A' ? 'B' : 'A';
             
             document.getElementById('cmdModalTitle').innerText = cmdKey ? 'Edit Command' : 'Add Command';
-            document.getElementById('cmdModalPaneInfo').innerText = `Modifying: ${state[paneKey].fileName}`; 
+            const prefix = paneKey === 'A' ? 'Base (A): ' : 'Compare (B): ';
+            document.getElementById('cmdModalPaneInfo').innerText = `Modifying: ${prefix}${state[paneKey].fileName}`; 
             
             const nameInput = document.getElementById('cmdModalNameInput');
             const valInput = document.getElementById('cmdModalValInput');
@@ -707,7 +747,7 @@
 
             if (state.compareMode && otherData) {
                 qActions.style.display = 'block';
-                btnCopy.innerText = `⏬ Copy from ${state[otherPaneKey].fileName} (${otherData.value ? `"${otherData.value}"` : 'No Value'})`;
+                btnCopy.innerText = `⏬ Copy from ${otherPaneKey === 'A' ? 'Base' : 'Compare'} (${otherData.value ? `"${otherData.value}"` : 'No Value'})`;
                 btnCopy.onclick = (event) => { 
                     event.preventDefault(); 
                     nameInput.value = otherData.originalName;
