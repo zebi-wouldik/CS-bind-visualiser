@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Ultimate CS2 Bind Visualizer</title>
+    <title>Ultimate CS2 Bind Visualizer - Dual Sync</title>
     <style>
         body {
             font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
@@ -11,25 +11,23 @@
             background-color: #1e1e2e;
             color: #cdd6f4;
             padding-bottom: 50px;
+            margin: 0;
         }
         
         h2 { border-bottom: 2px solid #313244; padding-bottom: 10px; margin-bottom: 20px; }
         
-        .controls-section {
+        .global-controls {
             margin-bottom: 30px;
             padding: 15px;
             background-color: #313244;
             border-radius: 8px;
             display: flex;
-            gap: 40px;
+            gap: 20px;
             align-items: flex-end;
+            flex-wrap: wrap;
         }
 
-        .control-group {
-            display: flex;
-            flex-direction: column;
-            gap: 10px;
-        }
+        .control-group { display: flex; flex-direction: column; gap: 8px; }
 
         select, input[type="file"] {
             padding: 8px;
@@ -42,367 +40,270 @@
             box-sizing: border-box;
         }
 
-        #btnDownloadCfg {
+        button {
             padding: 8px 20px;
             border-radius: 4px;
             border: none;
-            background-color: #a6e3a1;
-            color: #11111b;
             font-weight: bold;
             cursor: pointer;
             height: 35px;
-            transition: background-color 0.2s;
+            transition: all 0.2s;
             box-sizing: border-box;
-        }
-        #btnDownloadCfg:hover {
-            background-color: #94cc90;
+            color: #11111b;
         }
 
-        .keyboard-wrapper {
-            display: flex;
+        .btn-toggle-compare { background-color: #cba6f7; }
+        .btn-toggle-compare:hover { background-color: #b4befe; }
+        .btn-download { background-color: #89b4fa; }
+        .btn-download:hover { background-color: #74c7ec; }
+
+        /* --- LEGEND --- */
+        .legend-container {
+            display: none;
+            background-color: #181825;
+            padding: 10px 15px;
+            border-radius: 6px;
+            border: 1px solid #45475a;
+            margin-bottom: 20px;
             gap: 20px;
-            align-items: flex-end;
+            justify-content: center;
+            font-size: 13px;
+        }
+        .legend-item { display: flex; align-items: center; gap: 8px; font-weight: bold; }
+        .legend-box { width: 16px; height: 16px; border-radius: 4px; border: 2px solid transparent; }
+        
+        .c-match { background-color: #89b4fa; color: #11111b; }
+        .c-added { background-color: #a6e3a1; color: #11111b; }
+        .c-conflict { background-color: #f9e2af; color: #11111b; }
+        .c-missing { border-color: #f38ba8; background-color: transparent; }
+
+        /* --- DUAL PANE LAYOUT --- */
+        .split-view {
+            display: flex;
+            gap: 30px;
             flex-wrap: wrap;
         }
 
-        .main-board-container {
+        .pane {
+            flex: 1;
+            min-width: 900px; 
+            background-color: #181825;
+            border: 2px solid #313244;
+            border-radius: 12px;
+            padding: 20px;
             display: flex;
             flex-direction: column;
-            gap: 15px;
+            gap: 20px;
+            transition: all 0.3s ease;
         }
 
-        .block {
-            background-color: #181825;
-            padding: 15px;
-            border-radius: 10px;
-            display: flex;
-            flex-direction: column;
-            gap: 8px;
-        }
-        
+        #paneB { display: none; border-color: #cba6f7; }
+
+        .pane-header { display: flex; justify-content: space-between; align-items: center; border-bottom: 1px solid #45475a; padding-bottom: 15px; }
+        .pane-header h3 { margin: 0; color: #cdd6f4; font-family: 'Courier New', Courier, monospace; }
+        .pane-actions { display: flex; gap: 10px; }
+
+        /* --- KEYBOARD STYLES --- */
+        .keyboard-wrapper { display: flex; gap: 20px; align-items: flex-end; flex-wrap: wrap; justify-content: center; transform-origin: top left; }
+        .main-board-container { display: flex; flex-direction: column; gap: 15px; }
+        .block { background-color: #11111b; padding: 15px; border-radius: 10px; display: flex; flex-direction: column; gap: 8px; }
         .row { display: flex; gap: 8px; justify-content: center; }
 
         .key {
-            width: 50px;
-            height: 50px;
-            background-color: #313244;
-            border: 2px solid #45475a;
-            border-radius: 6px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            font-weight: bold;
-            font-size: 14px;
-            cursor: pointer;
-            transition: all 0.2s;
-            user-select: none;
-            box-sizing: border-box;
-            text-align: center;
-            white-space: pre-line;
-            line-height: 1.2;
-            flex-shrink: 0; /* Prevents shrinking on tight grids */
+            width: 50px; height: 50px;
+            background-color: #313244; border: 2px solid #45475a; border-radius: 6px;
+            display: flex; align-items: center; justify-content: center;
+            font-weight: bold; font-size: 14px; cursor: pointer;
+            transition: all 0.2s; user-select: none; box-sizing: border-box;
+            text-align: center; white-space: pre-line; line-height: 1.2; flex-shrink: 0;
+            color: #cdd6f4;
         }
-        .key:hover { background-color: #45475a; }
+        .key:hover { opacity: 0.8; transform: scale(1.05); z-index: 10; }
         .key.hidden { visibility: hidden; pointer-events: none; }
 
-        .key.bound {
-            background-color: #89b4fa;
-            color: #11111b;
-            border-color: #74c7ec;
-        }
-        .key.bound:hover { background-color: #b4befe; }
+        /* Base bound (Normal mode) */
+        .key.bound { background-color: #89b4fa; color: #11111b; border-color: #74c7ec; }
         
-        /* --- DYNAMIC KEYBOARD SHAPE STYLES --- */
-        .main-keyboard .row {
-            justify-content: flex-start; 
-            width: 870px; /* Fixed width to force alignment */
-        }
-        
-        /* Auto-fill the end of rows */
-        .main-keyboard .row .key:last-child {
-            flex-grow: 1; 
-            max-width: 140px; 
-        }
-        
-        /* Default Sizes */
-        .key.backspace { width: 100px; }
-        .key.tab { width: 80px; }
-        .key.caps { width: 95px; }
-        .key.enter { width: 100px; }
-        .key.shift-l { width: 125px; }
-        .key.shift-r { width: 125px; }
-        .key.space { width: 350px; }
+        /* Compare Mode Colors */
+        .key.diff-match { background-color: #89b4fa; color: #11111b; border-color: #74c7ec; }
+        .key.diff-added { background-color: #a6e3a1; color: #11111b; border-color: #94cc90; }
+        .key.diff-conflict { background-color: #f9e2af; color: #11111b; border-color: #f5c2e7; }
+        .key.diff-missing { border-color: #f38ba8; color: #f38ba8; border-style: dashed; }
 
-        /* Dynamic Layout Toggles */
+        /* Layout Sizes */
+        .main-keyboard .row { justify-content: flex-start; width: 870px; }
+        .main-keyboard .row .key:last-child { flex-grow: 1; max-width: 140px; }
+        .key.backspace { width: 100px; } .key.tab { width: 80px; } .key.caps { width: 95px; }
+        .key.enter { width: 100px; } .key.shift-l { width: 125px; } .key.shift-r { width: 125px; } .key.space { width: 350px; }
+
         .layout-ansi .iso-only { display: none !important; }
         .layout-iso .ansi-only { display: none !important; }
+        .layout-iso .key.shift-l { width: 50px; } 
+        .layout-iso .key.enter { width: 80px; } 
 
-        .layout-iso .key.shift-l { width: 50px; } /* Short shift */
-        .layout-iso .key.enter { width: 80px; } /* Bottom of ISO enter */
-
-        /* Numpad & Others */
-        .numpad {
-            display: grid;
-            grid-template-columns: repeat(4, 50px);
-            grid-template-rows: repeat(5, 50px);
-            gap: 8px;
-            background-color: #181825;
-            padding: 15px;
-            border-radius: 10px;
-        }
+        .numpad { display: grid; grid-template-columns: repeat(4, 50px); grid-template-rows: repeat(5, 50px); gap: 8px; background-color: #11111b; padding: 15px; border-radius: 10px; }
         .key.tall { grid-row: span 2; height: 100%; }
         .key.wide { grid-column: span 2; width: 100%; }
-        
-        #tooltip {
-            position: fixed;
-            background: #f9e2af;
-            color: #11111b;
-            padding: 8px 12px;
-            border-radius: 4px;
-            font-weight: bold;
-            pointer-events: none;
-            display: none;
-            z-index: 1000;
-            box-shadow: 0 4px 6px rgba(0,0,0,0.3);
-            white-space: pre-wrap;
-            word-wrap: break-word;
-            max-width: 350px;
-        }
 
         .section-label { font-size: 12px; color: #a6adc8; margin-bottom: -5px; text-transform: uppercase; letter-spacing: 1px; margin-top: 10px; }
 
-        /* Raw Editor & Modal */
-        .editor-section { margin-top: 40px; background-color: #313244; padding: 15px; border-radius: 8px; display: flex; flex-direction: column; gap: 10px; }
-        .editor-section h3 { margin: 0; padding-bottom: 10px; border-bottom: 1px solid #45475a; }
-        #cfgEditor { width: 100%; height: 250px; background-color: #11111b; color: #a6e3a1; border: 1px solid #45475a; border-radius: 6px; padding: 15px; font-family: 'Courier New', Courier, monospace; font-size: 14px; resize: vertical; box-sizing: border-box; outline: none; }
-        #cfgEditor:focus { border-color: #cba6f7; }
+        /* --- TEXTAREAS --- */
+        textarea {
+            width: 100%; height: 250px;
+            background-color: #11111b; color: #cdd6f4;
+            border: 1px solid #45475a; border-radius: 6px;
+            padding: 15px; font-family: 'Courier New', Courier, monospace;
+            font-size: 14px; resize: vertical; box-sizing: border-box; outline: none;
+        }
+        textarea:focus { border-color: #89b4fa; }
+        #editorB { color: #f5c2e7; } 
+
+        /* --- TOOLTIP & MODAL --- */
+        #tooltip {
+            position: fixed; background: #313244; color: #cdd6f4;
+            padding: 10px 15px; border-radius: 6px; font-weight: bold; font-family: monospace;
+            pointer-events: none; display: none; z-index: 1000;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.5); border: 1px solid #cba6f7;
+            white-space: pre-wrap; word-wrap: break-word; max-width: 400px;
+        }
 
         .modal-overlay { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(17, 17, 27, 0.8); z-index: 2000; align-items: center; justify-content: center; backdrop-filter: blur(3px); }
         .modal { background-color: #181825; border: 2px solid #cba6f7; border-radius: 8px; padding: 25px; width: 350px; display: flex; flex-direction: column; gap: 15px; box-shadow: 0 10px 40px rgba(0,0,0,0.6); }
-        .modal h3 { margin: 0; color: #cba6f7; border: none; padding: 0; }
+        .modal h3 { margin: 0; color: #cba6f7; }
         .modal p { margin: 0; font-size: 12px; color: #a6adc8; margin-top: -10px; }
-        .modal input { width: 100%; box-sizing: border-box; padding: 12px; font-family: 'Courier New', Courier, monospace; background-color: #11111b; color: #cdd6f4; border: 1px solid #45475a; border-radius: 4px; outline: none; }
-        .modal input:focus { border-color: #89b4fa; }
+        .modal input { width: 100%; box-sizing: border-box; padding: 12px; font-family: monospace; background-color: #11111b; color: #cdd6f4; border: 1px solid #45475a; border-radius: 4px; outline: none; }
         .modal-buttons { display: flex; gap: 10px; justify-content: flex-end; margin-top: 10px; }
-        .modal-buttons button { padding: 10px 15px; border: none; border-radius: 4px; cursor: pointer; font-weight: bold; background-color: #313244; color: #cdd6f4; transition: background-color 0.2s; }
-        .modal-buttons button:hover { background-color: #45475a; }
-        .modal-buttons button#btnSave { background-color: #a6e3a1; color: #11111b; }
-        .modal-buttons button#btnSave:hover { background-color: #94cc90; }
-        .modal-buttons button#btnUnbind { background-color: #f38ba8; color: #11111b; margin-right: auto; }
-        .modal-buttons button#btnUnbind:hover { background-color: #d97d96; }
+        .btn-save-bind { background-color: #a6e3a1 !important; color: #11111b !important; }
+        .btn-unbind { background-color: #f38ba8 !important; color: #11111b !important; margin-right: auto; }
     </style>
 </head>
 <body>
 
-    <h2>Ultimate CS2 Bind Visualizer</h2>
+    <h2>Ultimate CS2 Bind Visualizer - Live Diff Mode</h2>
     
-    <div class="controls-section">
+    <div class="global-controls">
         <div class="control-group">
-            <label for="cfgInput"><strong>1. Upload Configuration (.cfg)</strong></label>
-            <input type="file" id="cfgInput" accept=".cfg,.txt">
-        </div>
-        <div class="control-group">
-            <label for="layoutSwitch"><strong>2. Keyboard Layout Database</strong></label>
-            <select id="layoutSwitch">
-            </select>
+            <label for="layoutSwitch"><strong>Base Keyboard Layout</strong></label>
+            <select id="layoutSwitch"></select>
         </div>
         <div class="control-group" style="margin-left: auto;">
-            <label><strong>3. Export Configuration</strong></label>
-            <button id="btnDownloadCfg">Download .cfg</button>
+            <label><strong>Config Comparator</strong></label>
+            <button id="btnToggleCompare" class="btn-toggle-compare">Enable Compare Mode</button>
         </div>
+    </div>
+
+    <div class="legend-container" id="legendContainer">
+        <div class="legend-item"><div class="legend-box c-match"></div> Match</div>
+        <div class="legend-item"><div class="legend-box c-conflict"></div> Different Action (Conflict)</div>
+        <div class="legend-item"><div class="legend-box c-added"></div> Assigned Only Here</div>
+        <div class="legend-item"><div class="legend-box c-missing"></div> Missing (Assigned in other)</div>
     </div>
 
     <div id="tooltip"></div>
 
-    <div class="keyboard-wrapper">
-        <div class="main-board-container">
-            <div class="block f-keys">
-                <div class="row" style="justify-content: flex-start;">
-                    <div class="key static-key" data-binds="escape esc">Esc</div>
-                    <div style="width: 25px;"></div>
-                    <div class="key static-key" data-binds="f1">F1</div>
-                    <div class="key static-key" data-binds="f2">F2</div>
-                    <div class="key static-key" data-binds="f3">F3</div>
-                    <div class="key static-key" data-binds="f4">F4</div>
-                    <div style="width: 15px;"></div>
-                    <div class="key static-key" data-binds="f5">F5</div>
-                    <div class="key static-key" data-binds="f6">F6</div>
-                    <div class="key static-key" data-binds="f7">F7</div>
-                    <div class="key static-key" data-binds="f8">F8</div>
-                    <div style="width: 15px;"></div>
-                    <div class="key static-key" data-binds="f9">F9</div>
-                    <div class="key static-key" data-binds="f10">F10</div>
-                    <div class="key static-key" data-binds="f11">F11</div>
-                    <div class="key static-key" data-binds="f12">F12</div>
+    <div class="split-view">
+        <div class="pane" id="paneA">
+            <div class="pane-header">
+                <h3 id="titleA">config_A.cfg</h3>
+                <div class="pane-actions">
+                    <input type="file" id="uploadA" accept=".cfg,.txt">
+                    <button class="btn-download" id="downloadA">Export File</button>
                 </div>
             </div>
-
-            <div class="block main-keyboard layout-ansi">
-                <div class="row">
-                    <div class="key dyn-key" data-code="Backquote"></div>
-                    <div class="key dyn-key" data-code="Digit1"></div>
-                    <div class="key dyn-key" data-code="Digit2"></div>
-                    <div class="key dyn-key" data-code="Digit3"></div>
-                    <div class="key dyn-key" data-code="Digit4"></div>
-                    <div class="key dyn-key" data-code="Digit5"></div>
-                    <div class="key dyn-key" data-code="Digit6"></div>
-                    <div class="key dyn-key" data-code="Digit7"></div>
-                    <div class="key dyn-key" data-code="Digit8"></div>
-                    <div class="key dyn-key" data-code="Digit9"></div>
-                    <div class="key dyn-key" data-code="Digit0"></div>
-                    <div class="key dyn-key" data-code="Minus"></div>
-                    <div class="key dyn-key" data-code="Equal"></div>
-                    <div class="key backspace static-key" data-binds="backspace">Backspace</div>
-                </div>
-                <div class="row">
-                    <div class="key tab static-key" data-binds="tab">Tab</div>
-                    <div class="key dyn-key" data-code="KeyQ"></div>
-                    <div class="key dyn-key" data-code="KeyW"></div>
-                    <div class="key dyn-key" data-code="KeyE"></div>
-                    <div class="key dyn-key" data-code="KeyR"></div>
-                    <div class="key dyn-key" data-code="KeyT"></div>
-                    <div class="key dyn-key" data-code="KeyY"></div>
-                    <div class="key dyn-key" data-code="KeyU"></div>
-                    <div class="key dyn-key" data-code="KeyI"></div>
-                    <div class="key dyn-key" data-code="KeyO"></div>
-                    <div class="key dyn-key" data-code="KeyP"></div>
-                    <div class="key dyn-key" data-code="BracketLeft"></div>
-                    <div class="key dyn-key" data-code="BracketRight"></div>
-                    <div class="key dyn-key ansi-only" data-code="Backslash"></div> <div class="key enter iso-only static-key" data-binds="enter return">Enter</div> </div>
-                <div class="row">
-                    <div class="key caps static-key" data-binds="caps capslock">Caps</div>
-                    <div class="key dyn-key" data-code="KeyA"></div>
-                    <div class="key dyn-key" data-code="KeyS"></div>
-                    <div class="key dyn-key" data-code="KeyD"></div>
-                    <div class="key dyn-key" data-code="KeyF"></div>
-                    <div class="key dyn-key" data-code="KeyG"></div>
-                    <div class="key dyn-key" data-code="KeyH"></div>
-                    <div class="key dyn-key" data-code="KeyJ"></div>
-                    <div class="key dyn-key" data-code="KeyK"></div>
-                    <div class="key dyn-key" data-code="KeyL"></div>
-                    <div class="key dyn-key" data-code="Semicolon"></div>
-                    <div class="key dyn-key" data-code="Quote"></div>
-                    <div class="key dyn-key iso-only" data-code="Backslash"></div> <div class="key enter static-key" data-binds="enter return">Enter</div> </div>
-                <div class="row">
-                    <div class="key shift-l static-key" data-binds="shift">Shift</div>
-                    <div class="key dyn-key iso-only" data-code="IntlBackslash"></div> <div class="key dyn-key" data-code="KeyZ"></div>
-                    <div class="key dyn-key" data-code="KeyX"></div>
-                    <div class="key dyn-key" data-code="KeyC"></div>
-                    <div class="key dyn-key" data-code="KeyV"></div>
-                    <div class="key dyn-key" data-code="KeyB"></div>
-                    <div class="key dyn-key" data-code="KeyN"></div>
-                    <div class="key dyn-key" data-code="KeyM"></div>
-                    <div class="key dyn-key" data-code="Comma"></div>
-                    <div class="key dyn-key" data-code="Period"></div>
-                    <div class="key dyn-key" data-code="Slash"></div>
-                    <div class="key shift-r static-key" data-binds="rshift">Shift</div>
-                </div>
-                <div class="row" style="justify-content: center;">
-                    <div class="key static-key" data-binds="ctrl">Ctrl</div>
-                    <div class="key static-key" data-binds="alt">Alt</div>
-                    <div class="key space static-key" data-binds="space">Space</div>
-                    <div class="key static-key" data-binds="altgr ralt">AltGr</div>
-                    <div class="key static-key" data-binds="rctrl">Ctrl</div>
-                </div>
-            </div>
+            <div class="keyboard-wrapper" id="kbWrapA"></div>
+            <textarea id="editorA" spellcheck="false" placeholder="// Paste or type your config here..."></textarea>
         </div>
 
-        <div>
-            <div class="block" style="margin-bottom: 15px; margin-top: 65px;">
-                <div class="row">
-                    <div class="key static-key" data-binds="ins insert">Ins</div>
-                    <div class="key static-key" data-binds="home">Home</div>
-                    <div class="key static-key" data-binds="pgup">PgUp</div>
-                </div>
-                <div class="row">
-                    <div class="key static-key" data-binds="del delete">Del</div>
-                    <div class="key static-key" data-binds="end">End</div>
-                    <div class="key static-key" data-binds="pgdn">PgDn</div>
+        <div class="pane" id="paneB">
+            <div class="pane-header">
+                <h3 id="titleB">config_B.cfg</h3>
+                <div class="pane-actions">
+                    <input type="file" id="uploadB" accept=".cfg,.txt">
+                    <button class="btn-download" id="downloadB">Export File</button>
                 </div>
             </div>
-
-            <div class="block">
-                <div class="row">
-                    <div class="key hidden"></div>
-                    <div class="key static-key" data-binds="uparrow">▲</div>
-                    <div class="key hidden"></div>
-                </div>
-                <div class="row">
-                    <div class="key static-key" data-binds="leftarrow">◀</div>
-                    <div class="key static-key" data-binds="downarrow">▼</div>
-                    <div class="key static-key" data-binds="rightarrow">▶</div>
-                </div>
-            </div>
+            <div class="keyboard-wrapper" id="kbWrapB"></div>
+            <textarea id="editorB" spellcheck="false" placeholder="// Paste or type your config here..."></textarea>
         </div>
-
-        <div>
-            <div class="numpad" style="margin-top: 65px;">
-                <div class="key static-key" data-binds="numlock">Num</div>
-                <div class="key static-key" data-binds="kp_slash kp_divide">/</div>
-                <div class="key static-key" data-binds="kp_multiply">*</div>
-                <div class="key static-key" data-binds="kp_minus">-</div>
-                
-                <div class="key static-key" data-binds="kp_home kp_7">7</div>
-                <div class="key static-key" data-binds="kp_uparrow kp_8">8</div>
-                <div class="key static-key" data-binds="kp_pgup kp_9">9</div>
-                <div class="key tall static-key" data-binds="kp_plus">+</div>
-                
-                <div class="key static-key" data-binds="kp_leftarrow kp_4">4</div>
-                <div class="key static-key" data-binds="kp_5">5</div>
-                <div class="key static-key" data-binds="kp_rightarrow kp_6">6</div>
-                
-                <div class="key static-key" data-binds="kp_end kp_1">1</div>
-                <div class="key static-key" data-binds="kp_downarrow kp_2">2</div>
-                <div class="key static-key" data-binds="kp_pgdn kp_3">3</div>
-                <div class="key tall static-key" data-binds="kp_enter">Ent</div>
-                
-                <div class="key wide static-key" data-binds="kp_ins kp_0">0</div>
-                <div class="key static-key" data-binds="kp_del kp_dot">.</div>
-            </div>
-        </div>
-
-        <div>
-            <div class="block" style="margin-top: 65px;">
-                <div class="section-label">Mouse</div>
-                <div class="row">
-                    <div class="key static-key" data-binds="mouse4">M4</div>
-                    <div class="key static-key" data-binds="mwheelup">WU</div>
-                    <div class="key static-key" data-binds="mouse5">M5</div>
-                </div>
-                <div class="row">
-                    <div class="key static-key" data-binds="mouse1">M1</div>
-                    <div class="key static-key" data-binds="mouse3">M3</div>
-                    <div class="key static-key" data-binds="mouse2">M2</div>
-                </div>
-                <div class="row">
-                    <div class="key hidden"></div>
-                    <div class="key static-key" data-binds="mwheeldown">WD</div>
-                    <div class="key hidden"></div>
-                </div>
-            </div>
-        </div>
-    </div>
-
-    <div class="editor-section">
-        <h3>Raw Configuration File</h3>
-        <textarea id="cfgEditor" spellcheck="false" placeholder="// Upload a file, start typing here, or click a key above to generate binds..."></textarea>
     </div>
 
     <div id="bindModalOverlay" class="modal-overlay">
         <div class="modal">
             <h3 id="modalTitle">Edit Bind</h3>
             <p id="modalKeyInfo"></p>
+            <p id="modalPaneInfo" style="color: #f9e2af; font-weight: bold; margin-bottom: 5px;"></p>
             <input type="text" id="modalBindInput" placeholder="e.g. +jump">
             <div class="modal-buttons">
-                <button id="btnUnbind">Unbind</button>
+                <button id="btnUnbind" class="btn-unbind">Unbind</button>
                 <button id="btnCancel">Cancel</button>
-                <button id="btnSave">Save</button>
+                <button id="btnSave" class="btn-save-bind">Save</button>
             </div>
         </div>
     </div>
 
+    <template id="keyboardTemplate">
+        <div class="main-board-container">
+            <div class="block f-keys">
+                <div class="row" style="justify-content: flex-start;">
+                    <div class="key static-key" data-binds="escape esc">Esc</div>
+                    <div style="width: 25px;"></div>
+                    <div class="key static-key" data-binds="f1">F1</div><div class="key static-key" data-binds="f2">F2</div><div class="key static-key" data-binds="f3">F3</div><div class="key static-key" data-binds="f4">F4</div>
+                    <div style="width: 15px;"></div>
+                    <div class="key static-key" data-binds="f5">F5</div><div class="key static-key" data-binds="f6">F6</div><div class="key static-key" data-binds="f7">F7</div><div class="key static-key" data-binds="f8">F8</div>
+                    <div style="width: 15px;"></div>
+                    <div class="key static-key" data-binds="f9">F9</div><div class="key static-key" data-binds="f10">F10</div><div class="key static-key" data-binds="f11">F11</div><div class="key static-key" data-binds="f12">F12</div>
+                </div>
+            </div>
+
+            <div class="block main-keyboard layout-ansi">
+                <div class="row">
+                    <div class="key dyn-key" data-code="Backquote"></div><div class="key dyn-key" data-code="Digit1"></div><div class="key dyn-key" data-code="Digit2"></div><div class="key dyn-key" data-code="Digit3"></div><div class="key dyn-key" data-code="Digit4"></div><div class="key dyn-key" data-code="Digit5"></div><div class="key dyn-key" data-code="Digit6"></div><div class="key dyn-key" data-code="Digit7"></div><div class="key dyn-key" data-code="Digit8"></div><div class="key dyn-key" data-code="Digit9"></div><div class="key dyn-key" data-code="Digit0"></div><div class="key dyn-key" data-code="Minus"></div><div class="key dyn-key" data-code="Equal"></div><div class="key backspace static-key" data-binds="backspace">Backspace</div>
+                </div>
+                <div class="row">
+                    <div class="key tab static-key" data-binds="tab">Tab</div><div class="key dyn-key" data-code="KeyQ"></div><div class="key dyn-key" data-code="KeyW"></div><div class="key dyn-key" data-code="KeyE"></div><div class="key dyn-key" data-code="KeyR"></div><div class="key dyn-key" data-code="KeyT"></div><div class="key dyn-key" data-code="KeyY"></div><div class="key dyn-key" data-code="KeyU"></div><div class="key dyn-key" data-code="KeyI"></div><div class="key dyn-key" data-code="KeyO"></div><div class="key dyn-key" data-code="KeyP"></div><div class="key dyn-key" data-code="BracketLeft"></div><div class="key dyn-key" data-code="BracketRight"></div><div class="key dyn-key ansi-only" data-code="Backslash"></div><div class="key enter iso-only static-key" data-binds="enter return">Enter</div>
+                </div>
+                <div class="row">
+                    <div class="key caps static-key" data-binds="caps capslock">Caps</div><div class="key dyn-key" data-code="KeyA"></div><div class="key dyn-key" data-code="KeyS"></div><div class="key dyn-key" data-code="KeyD"></div><div class="key dyn-key" data-code="KeyF"></div><div class="key dyn-key" data-code="KeyG"></div><div class="key dyn-key" data-code="KeyH"></div><div class="key dyn-key" data-code="KeyJ"></div><div class="key dyn-key" data-code="KeyK"></div><div class="key dyn-key" data-code="KeyL"></div><div class="key dyn-key" data-code="Semicolon"></div><div class="key dyn-key" data-code="Quote"></div><div class="key dyn-key iso-only" data-code="Backslash"></div><div class="key enter static-key" data-binds="enter return">Enter</div>
+                </div>
+                <div class="row">
+                    <div class="key shift-l static-key" data-binds="shift">Shift</div><div class="key dyn-key iso-only" data-code="IntlBackslash"></div><div class="key dyn-key" data-code="KeyZ"></div><div class="key dyn-key" data-code="KeyX"></div><div class="key dyn-key" data-code="KeyC"></div><div class="key dyn-key" data-code="KeyV"></div><div class="key dyn-key" data-code="KeyB"></div><div class="key dyn-key" data-code="KeyN"></div><div class="key dyn-key" data-code="KeyM"></div><div class="key dyn-key" data-code="Comma"></div><div class="key dyn-key" data-code="Period"></div><div class="key dyn-key" data-code="Slash"></div><div class="key shift-r static-key" data-binds="rshift">Shift</div>
+                </div>
+                <div class="row" style="justify-content: center;">
+                    <div class="key static-key" data-binds="ctrl">Ctrl</div><div class="key static-key" data-binds="alt">Alt</div><div class="key space static-key" data-binds="space">Space</div><div class="key static-key" data-binds="altgr ralt">AltGr</div><div class="key static-key" data-binds="rctrl">Ctrl</div>
+                </div>
+            </div>
+        </div>
+        <div>
+            <div class="block" style="margin-bottom: 15px; margin-top: 65px;">
+                <div class="row"><div class="key static-key" data-binds="ins insert">Ins</div><div class="key static-key" data-binds="home">Home</div><div class="key static-key" data-binds="pgup">PgUp</div></div>
+                <div class="row"><div class="key static-key" data-binds="del delete">Del</div><div class="key static-key" data-binds="end">End</div><div class="key static-key" data-binds="pgdn">PgDn</div></div>
+            </div>
+            <div class="block">
+                <div class="row"><div class="key hidden"></div><div class="key static-key" data-binds="uparrow">▲</div><div class="key hidden"></div></div>
+                <div class="row"><div class="key static-key" data-binds="leftarrow">◀</div><div class="key static-key" data-binds="downarrow">▼</div><div class="key static-key" data-binds="rightarrow">▶</div></div>
+            </div>
+        </div>
+        <div>
+            <div class="numpad" style="margin-top: 65px;">
+                <div class="key static-key" data-binds="numlock">Num</div><div class="key static-key" data-binds="kp_slash kp_divide">/</div><div class="key static-key" data-binds="kp_multiply">*</div><div class="key static-key" data-binds="kp_minus">-</div>
+                <div class="key static-key" data-binds="kp_home kp_7">7</div><div class="key static-key" data-binds="kp_uparrow kp_8">8</div><div class="key static-key" data-binds="kp_pgup kp_9">9</div><div class="key tall static-key" data-binds="kp_plus">+</div>
+                <div class="key static-key" data-binds="kp_leftarrow kp_4">4</div><div class="key static-key" data-binds="kp_5">5</div><div class="key static-key" data-binds="kp_rightarrow kp_6">6</div>
+                <div class="key static-key" data-binds="kp_end kp_1">1</div><div class="key static-key" data-binds="kp_downarrow kp_2">2</div><div class="key static-key" data-binds="kp_pgdn kp_3">3</div><div class="key tall static-key" data-binds="kp_enter">Ent</div>
+                <div class="key wide static-key" data-binds="kp_ins kp_0">0</div><div class="key static-key" data-binds="kp_del kp_dot">.</div>
+            </div>
+        </div>
+        <div>
+            <div class="block" style="margin-top: 65px;">
+                <div class="section-label">Mouse</div>
+                <div class="row"><div class="key static-key" data-binds="mouse4">M4</div><div class="key static-key" data-binds="mwheelup">WU</div><div class="key static-key" data-binds="mouse5">M5</div></div>
+                <div class="row"><div class="key static-key" data-binds="mouse1">M1</div><div class="key static-key" data-binds="mouse3">M3</div><div class="key static-key" data-binds="mouse2">M2</div></div>
+                <div class="row"><div class="key hidden"></div><div class="key static-key" data-binds="mwheeldown">WD</div><div class="key hidden"></div></div>
+            </div>
+        </div>
+    </template>
+
     <script>
-        // --- 1. CS2 SCANCODE DATABASE ---
+        // --- DATA DICTIONARIES ---
         const scancodes = {
             "Backquote": "scancode53", "Digit1": "scancode30", "Digit2": "scancode31", "Digit3": "scancode32", "Digit4": "scancode33", "Digit5": "scancode34", "Digit6": "scancode35", "Digit7": "scancode36", "Digit8": "scancode37", "Digit9": "scancode38", "Digit0": "scancode39", "Minus": "scancode45", "Equal": "scancode46",
             "KeyQ": "scancode20", "KeyW": "scancode26", "KeyE": "scancode8", "KeyR": "scancode21", "KeyT": "scancode23", "KeyY": "scancode28", "KeyU": "scancode24", "KeyI": "scancode12", "KeyO": "scancode18", "KeyP": "scancode19", "BracketLeft": "scancode47", "BracketRight": "scancode48",
@@ -410,326 +311,290 @@
             "IntlBackslash": "scancode100", "KeyZ": "scancode29", "KeyX": "scancode27", "KeyC": "scancode6", "KeyV": "scancode25", "KeyB": "scancode5", "KeyN": "scancode17", "KeyM": "scancode16", "Comma": "scancode54", "Period": "scancode55", "Slash": "scancode56"
         };
 
-        // --- 2. LAYOUT DICTIONARY DATABASE (WITH PHYSICAL TYPES) ---
         const layoutsDB = {
-            "qwerty_us": {
-                name: "QWERTY (US ANSI)", type: "ansi",
-                keys: {
-                    "Backquote": ["~ `", "`", "~"], "Digit1": ["1 !", "1"], "Digit2": ["2 @", "2"], "Digit3": ["3 #", "3"], "Digit4": ["4 $", "4"], "Digit5": ["5 %", "5"], "Digit6": ["6 ^", "6"], "Digit7": ["7 &", "7"], "Digit8": ["8 *", "8"], "Digit9": ["9 (", "9"], "Digit0": ["0 )", "0"], "Minus": ["- _", "-"], "Equal": ["= +", "="],
-                    "KeyQ": ["Q", "q"], "KeyW": ["W", "w"], "KeyE": ["E", "e"], "KeyR": ["R", "r"], "KeyT": ["T", "t"], "KeyY": ["Y", "y"], "KeyU": ["U", "u"], "KeyI": ["I", "i"], "KeyO": ["O", "o"], "KeyP": ["P", "p"], "BracketLeft": ["[ {", "["], "BracketRight": ["] }", "]"],
-                    "KeyA": ["A", "a"], "KeyS": ["S", "s"], "KeyD": ["D", "d"], "KeyF": ["F", "f"], "KeyG": ["G", "g"], "KeyH": ["H", "h"], "KeyJ": ["J", "j"], "KeyK": ["K", "k"], "KeyL": ["L", "l"], "Semicolon": ["; :", ";"], "Quote": ["' \"", "'"], "Backslash": ["\\ |", "\\"],
-                    "IntlBackslash": ["< >", "<", ">"], "KeyZ": ["Z", "z"], "KeyX": ["X", "x"], "KeyC": ["C", "c"], "KeyV": ["V", "v"], "KeyB": ["B", "b"], "KeyN": ["N", "n"], "KeyM": ["M", "m"], "Comma": [", <", ","], "Period": [". >", "."], "Slash": ["/ ?", "/"]
-                }
-            },
-            "qwerty_uk": {
-                name: "QWERTY (UK ISO)", type: "iso",
-                keys: {
-                    "Backquote": ["` ¬", "`"], "Digit1": ["1 !", "1"], "Digit2": ["2 \"", "2"], "Digit3": ["3 £", "3"], "Digit4": ["4 $", "4"], "Digit5": ["5 %", "5"], "Digit6": ["6 ^", "6"], "Digit7": ["7 &", "7"], "Digit8": ["8 *", "8"], "Digit9": ["9 (", "9"], "Digit0": ["0 )", "0"], "Minus": ["- _", "-"], "Equal": ["= +", "="],
-                    "KeyQ": ["Q", "q"], "KeyW": ["W", "w"], "KeyE": ["E", "e"], "KeyR": ["R", "r"], "KeyT": ["T", "t"], "KeyY": ["Y", "y"], "KeyU": ["U", "u"], "KeyI": ["I", "i"], "KeyO": ["O", "o"], "KeyP": ["P", "p"], "BracketLeft": ["[ {", "["], "BracketRight": ["] }", "]"],
-                    "KeyA": ["A", "a"], "KeyS": ["S", "s"], "KeyD": ["D", "d"], "KeyF": ["F", "f"], "KeyG": ["G", "g"], "KeyH": ["H", "h"], "KeyJ": ["J", "j"], "KeyK": ["K", "k"], "KeyL": ["L", "l"], "Semicolon": ["; :", ";"], "Quote": ["' @", "'"], "Backslash": ["# ~", "#"],
-                    "IntlBackslash": ["\\ |", "\\"], "KeyZ": ["Z", "z"], "KeyX": ["X", "x"], "KeyC": ["C", "c"], "KeyV": ["V", "v"], "KeyB": ["B", "b"], "KeyN": ["N", "n"], "KeyM": ["M", "m"], "Comma": [", <", ","], "Period": [". >", "."], "Slash": ["/ ?", "/"]
-                }
-            },
-            "azerty_fr": {
-                name: "AZERTY (France)", type: "iso",
-                keys: {
-                    "Backquote": ["²", "²"], "Digit1": ["& 1", "1", "&"], "Digit2": ["é 2", "2", "é"], "Digit3": ["\" 3", "3", "\""], "Digit4": ["' 4", "4", "'"], "Digit5": ["( 5", "5", "("], "Digit6": ["- 6", "6", "-"], "Digit7": ["è 7", "7", "è"], "Digit8": ["_ 8", "8", "_"], "Digit9": ["ç 9", "9", "ç"], "Digit0": ["à 0", "0", "à"], "Minus": [") °", ")"], "Equal": ["= +", "="],
-                    "KeyQ": ["A", "a", "q"], "KeyW": ["Z", "z", "w"], "KeyE": ["E", "e"], "KeyR": ["R", "r"], "KeyT": ["T", "t"], "KeyY": ["Y", "y"], "KeyU": ["U", "u"], "KeyI": ["I", "i"], "KeyO": ["O", "o"], "KeyP": ["P", "p"], "BracketLeft": ["^ ¨", "^", "["], "BracketRight": ["$ £", "$", "]"],
-                    "KeyA": ["Q", "q", "a"], "KeyS": ["S", "s"], "KeyD": ["D", "d"], "KeyF": ["F", "f"], "KeyG": ["G", "g"], "KeyH": ["H", "h"], "KeyJ": ["J", "j"], "KeyK": ["K", "k"], "KeyL": ["L", "l"], "Semicolon": ["M", "m", ";"], "Quote": ["ù %", "ù", "'"], "Backslash": ["* µ", "*", "\\"],
-                    "IntlBackslash": ["< >", "<", ">"], "KeyZ": ["W", "w", "z"], "KeyX": ["X", "x"], "KeyC": ["C", "c"], "KeyV": ["V", "v"], "KeyB": ["B", "b"], "KeyN": ["N", "n"], "KeyM": [", ?", ","], "Comma": ["; .", ";"], "Period": [": /", ":"], "Slash": ["! §", "!"]
-                }
-            },
-            "azerty_be": {
-                name: "AZERTY (Belgium)", type: "iso",
-                keys: {
-                    "Backquote": ["² ³", "²"], "Digit1": ["& 1", "1", "&"], "Digit2": ["é 2", "2", "é"], "Digit3": ["\" 3", "3", "\""], "Digit4": ["' 4", "4", "'"], "Digit5": ["( 5", "5", "("], "Digit6": ["§ 6", "6", "§"], "Digit7": ["è 7", "7", "è"], "Digit8": ["! 8", "8", "!"], "Digit9": ["ç 9", "9", "ç"], "Digit0": ["à 0", "0", "à"], "Minus": [") °", ")"], "Equal": ["- _", "-"],
-                    "KeyQ": ["A", "a", "q"], "KeyW": ["Z", "z", "w"], "KeyE": ["E", "e"], "KeyR": ["R", "r"], "KeyT": ["T", "t"], "KeyY": ["Y", "y"], "KeyU": ["U", "u"], "KeyI": ["I", "i"], "KeyO": ["O", "o"], "KeyP": ["P", "p"], "BracketLeft": ["^ ¨", "^", "["], "BracketRight": ["$ *", "$", "]"],
-                    "KeyA": ["Q", "q", "a"], "KeyS": ["S", "s"], "KeyD": ["D", "d"], "KeyF": ["F", "f"], "KeyG": ["G", "g"], "KeyH": ["H", "h"], "KeyJ": ["J", "j"], "KeyK": ["K", "k"], "KeyL": ["L", "l"], "Semicolon": ["M", "m", ";"], "Quote": ["ù %", "ù", "'"], "Backslash": ["µ £", "µ", "\\"],
-                    "IntlBackslash": ["< >", "<", ">"], "KeyZ": ["W", "w", "z"], "KeyX": ["X", "x"], "KeyC": ["C", "c"], "KeyV": ["V", "v"], "KeyB": ["B", "b"], "KeyN": ["N", "n"], "KeyM": [", ?", ","], "Comma": ["; .", ";"], "Period": [": /", ":"], "Slash": ["= +", "="]
-                }
-            },
-            "qwertz_de": {
-                name: "QWERTZ (Germany)", type: "iso",
-                keys: {
-                    "Backquote": ["^ °", "^"], "Digit1": ["1 !", "1"], "Digit2": ["2 \"", "2"], "Digit3": ["3 §", "3"], "Digit4": ["4 $", "4"], "Digit5": ["5 %", "5"], "Digit6": ["6 &", "6"], "Digit7": ["7 /", "7"], "Digit8": ["8 (", "8"], "Digit9": ["9 )", "9"], "Digit0": ["0 =", "0"], "Minus": ["ß ?", "ß"], "Equal": ["´ `", "´"],
-                    "KeyQ": ["Q", "q"], "KeyW": ["W", "w"], "KeyE": ["E", "e"], "KeyR": ["R", "r"], "KeyT": ["T", "t"], "KeyY": ["Z", "z", "y"], "KeyU": ["U", "u"], "KeyI": ["I", "i"], "KeyO": ["O", "o"], "KeyP": ["P", "p"], "BracketLeft": ["Ü", "ü", "["], "BracketRight": ["+ *", "+", "]"],
-                    "KeyA": ["A", "a"], "KeyS": ["S", "s"], "KeyD": ["D", "d"], "KeyF": ["F", "f"], "KeyG": ["G", "g"], "KeyH": ["H", "h"], "KeyJ": ["J", "j"], "KeyK": ["K", "k"], "KeyL": ["L", "l"], "Semicolon": ["Ö", "ö", ";"], "Quote": ["Ä", "ä", "'"], "Backslash": ["# '", "#", "\\"],
-                    "IntlBackslash": ["< >", "<", ">"], "KeyZ": ["Y", "y", "z"], "KeyX": ["X", "x"], "KeyC": ["C", "c"], "KeyV": ["V", "v"], "KeyB": ["B", "b"], "KeyN": ["N", "n"], "KeyM": ["M", "m"], "Comma": [", ;", ","], "Period": [". :", "."], "Slash": ["- _", "-"]
-                }
-            },
-            "qwerty_es": {
-                name: "QWERTY (Spanish)", type: "iso",
-                keys: {
-                    "Backquote": ["º ª", "º"], "Digit1": ["1 !", "1"], "Digit2": ["2 \"", "2"], "Digit3": ["3 ·", "3"], "Digit4": ["4 $", "4"], "Digit5": ["5 %", "5"], "Digit6": ["6 &", "6"], "Digit7": ["7 /", "7"], "Digit8": ["8 (", "8"], "Digit9": ["9 )", "9"], "Digit0": ["0 =", "0"], "Minus": ["' ?", "'"], "Equal": ["¡ ¿", "¡"],
-                    "KeyQ": ["Q", "q"], "KeyW": ["W", "w"], "KeyE": ["E", "e"], "KeyR": ["R", "r"], "KeyT": ["T", "t"], "KeyY": ["Y", "y"], "KeyU": ["U", "u"], "KeyI": ["I", "i"], "KeyO": ["O", "o"], "KeyP": ["P", "p"], "BracketLeft": ["` ^", "`", "["], "BracketRight": ["+ *", "+", "]"],
-                    "KeyA": ["A", "a"], "KeyS": ["S", "s"], "KeyD": ["D", "d"], "KeyF": ["F", "f"], "KeyG": ["G", "g"], "KeyH": ["H", "h"], "KeyJ": ["J", "j"], "KeyK": ["K", "k"], "KeyL": ["L", "l"], "Semicolon": ["Ñ", "ñ", ";"], "Quote": ["´ ¨", "´", "'"], "Backslash": ["ç Ç", "ç", "\\"],
-                    "IntlBackslash": ["< >", "<", ">"], "KeyZ": ["Z", "z"], "KeyX": ["X", "x"], "KeyC": ["C", "c"], "KeyV": ["V", "v"], "KeyB": ["B", "b"], "KeyN": ["N", "n"], "KeyM": ["M", "m"], "Comma": [", ;", ","], "Period": [". :", "."], "Slash": ["- _", "-"]
-                }
-            },
-            "qwerty_nordic": {
-                name: "QWERTY (Nordic ISO)", type: "iso",
-                keys: {
-                    "Backquote": ["§ ½", "§"], "Digit1": ["1 !", "1"], "Digit2": ["2 \"", "2"], "Digit3": ["3 #", "3"], "Digit4": ["4 ¤", "4"], "Digit5": ["5 %", "5"], "Digit6": ["6 &", "6"], "Digit7": ["7 /", "7"], "Digit8": ["8 (", "8"], "Digit9": ["9 )", "9"], "Digit0": ["0 =", "0"], "Minus": ["+ ?", "+"], "Equal": ["´ `", "´"],
-                    "KeyQ": ["Q", "q"], "KeyW": ["W", "w"], "KeyE": ["E", "e"], "KeyR": ["R", "r"], "KeyT": ["T", "t"], "KeyY": ["Y", "y"], "KeyU": ["U", "u"], "KeyI": ["I", "i"], "KeyO": ["O", "o"], "KeyP": ["P", "p"], "BracketLeft": ["Å", "å", "["], "BracketRight": ["¨ ^", "¨", "]"],
-                    "KeyA": ["A", "a"], "KeyS": ["S", "s"], "KeyD": ["D", "d"], "KeyF": ["F", "f"], "KeyG": ["G", "g"], "KeyH": ["H", "h"], "KeyJ": ["J", "j"], "KeyK": ["K", "k"], "KeyL": ["L", "l"], "Semicolon": ["Ö Æ", "ö", "æ", ";"], "Quote": ["Ä Ø", "ä", "ø", "'"], "Backslash": ["' *", "'", "\\"],
-                    "IntlBackslash": ["< >", "<", ">"], "KeyZ": ["Z", "z"], "KeyX": ["X", "x"], "KeyC": ["C", "c"], "KeyV": ["V", "v"], "KeyB": ["B", "b"], "KeyN": ["N", "n"], "KeyM": ["M", "m"], "Comma": [", ;", ","], "Period": [". :", "."], "Slash": ["- _", "-"]
-                }
-            },
-            "dvorak": {
-                name: "Dvorak", type: "ansi",
-                keys: {
-                    "Backquote": ["` ~", "`"], "Digit1": ["1 !", "1"], "Digit2": ["2 @", "2"], "Digit3": ["3 #", "3"], "Digit4": ["4 $", "4"], "Digit5": ["5 %", "5"], "Digit6": ["6 ^", "6"], "Digit7": ["7 &", "7"], "Digit8": ["8 *", "8"], "Digit9": ["9 (", "9"], "Digit0": ["0 )", "0"], "Minus": ["[ {", "["], "Equal": ["] }", "]"],
-                    "KeyQ": ["' \"", "'"], "KeyW": [", <", ","], "KeyE": [". >", "."], "KeyR": ["P", "p"], "KeyT": ["Y", "y"], "KeyY": ["F", "f"], "KeyU": ["G", "g"], "KeyI": ["C", "c"], "KeyO": ["R", "r"], "KeyP": ["L", "l"], "BracketLeft": ["/ ?", "/"], "BracketRight": ["= +", "="],
-                    "KeyA": ["A", "a"], "KeyS": ["O", "o"], "KeyD": ["E", "e"], "KeyF": ["U", "u"], "KeyG": ["I", "i"], "KeyH": ["D", "d"], "KeyJ": ["H", "h"], "KeyK": ["T", "t"], "KeyL": ["N", "n"], "Semicolon": ["S", "s"], "Quote": ["- _", "-"], "Backslash": ["\\ |", "\\"],
-                    "IntlBackslash": ["< >", "<", ">"], "KeyZ": ["; :", ";"], "KeyX": ["Q", "q"], "KeyC": ["J", "j"], "KeyV": ["K", "k"], "KeyB": ["X", "x"], "KeyN": ["B", "b"], "KeyM": ["M", "m"], "Comma": ["W", "w"], "Period": ["V", "v"], "Slash": ["Z", "z"]
-                }
-            },
-            "colemak": {
-                name: "Colemak", type: "ansi",
-                keys: {
-                    "Backquote": ["` ~", "`"], "Digit1": ["1 !", "1"], "Digit2": ["2 @", "2"], "Digit3": ["3 #", "3"], "Digit4": ["4 $", "4"], "Digit5": ["5 %", "5"], "Digit6": ["6 ^", "6"], "Digit7": ["7 &", "7"], "Digit8": ["8 *", "8"], "Digit9": ["9 (", "9"], "Digit0": ["0 )", "0"], "Minus": ["- _", "-"], "Equal": ["= +", "="],
-                    "KeyQ": ["Q", "q"], "KeyW": ["W", "w"], "KeyE": ["F", "f"], "KeyR": ["P", "p"], "KeyT": ["G", "g"], "KeyY": ["J", "j"], "KeyU": ["L", "l"], "KeyI": ["U", "u"], "KeyO": ["Y", "y"], "KeyP": ["; :", ";"], "BracketLeft": ["[ {", "["], "BracketRight": ["] }", "]"],
-                    "KeyA": ["A", "a"], "KeyS": ["R", "r"], "KeyD": ["S", "s"], "KeyF": ["T", "t"], "KeyG": ["D", "d"], "KeyH": ["H", "h"], "KeyJ": ["N", "n"], "KeyK": ["E", "e"], "KeyL": ["I", "i"], "Semicolon": ["O", "o"], "Quote": ["' \"", "'"], "Backslash": ["\\ |", "\\"],
-                    "IntlBackslash": ["< >", "<", ">"], "KeyZ": ["Z", "z"], "KeyX": ["X", "x"], "KeyC": ["C", "c"], "KeyV": ["V", "v"], "KeyB": ["B", "b"], "KeyN": ["K", "k"], "KeyM": ["M", "m"], "Comma": [", <", ","], "Period": [". >", "."], "Slash": ["/ ?", "/"]
-                }
-            },
-            "workman": {
-                name: "Workman", type: "ansi",
-                keys: {
-                    "Backquote": ["` ~", "`"], "Digit1": ["1 !", "1"], "Digit2": ["2 @", "2"], "Digit3": ["3 #", "3"], "Digit4": ["4 $", "4"], "Digit5": ["5 %", "5"], "Digit6": ["6 ^", "6"], "Digit7": ["7 &", "7"], "Digit8": ["8 *", "8"], "Digit9": ["9 (", "9"], "Digit0": ["0 )", "0"], "Minus": ["- _", "-"], "Equal": ["= +", "="],
-                    "KeyQ": ["Q", "q"], "KeyW": ["D", "d"], "KeyE": ["R", "r"], "KeyR": ["W", "w"], "KeyT": ["B", "b"], "KeyY": ["J", "j"], "KeyU": ["F", "f"], "KeyI": ["U", "u"], "KeyO": ["P", "p"], "KeyP": ["; :", ";"], "BracketLeft": ["[ {", "["], "BracketRight": ["] }", "]"],
-                    "KeyA": ["A", "a"], "KeyS": ["S", "s"], "KeyD": ["H", "h"], "KeyF": ["T", "t"], "KeyG": ["G", "g"], "KeyH": ["Y", "y"], "KeyJ": ["N", "n"], "KeyK": ["E", "e"], "KeyL": ["O", "o"], "Semicolon": ["I", "i"], "Quote": ["' \"", "'"], "Backslash": ["\\ |", "\\"],
-                    "IntlBackslash": ["< >", "<", ">"], "KeyZ": ["Z", "z"], "KeyX": ["X", "x"], "KeyC": ["M", "m"], "KeyV": ["C", "c"], "KeyB": ["V", "v"], "KeyN": ["K", "k"], "KeyM": ["L", "l"], "Comma": [", <", ","], "Period": [". >", "."], "Slash": ["/ ?", "/"]
-                }
-            }
+            "qwerty_us": { name: "QWERTY (US ANSI)", type: "ansi", keys: { "Backquote": ["~ `", "`", "~"], "Digit1": ["1 !", "1"], "Digit2": ["2 @", "2"], "Digit3": ["3 #", "3"], "Digit4": ["4 $", "4"], "Digit5": ["5 %", "5"], "Digit6": ["6 ^", "6"], "Digit7": ["7 &", "7"], "Digit8": ["8 *", "8"], "Digit9": ["9 (", "9"], "Digit0": ["0 )", "0"], "Minus": ["- _", "-"], "Equal": ["= +", "="], "KeyQ": ["Q", "q"], "KeyW": ["W", "w"], "KeyE": ["E", "e"], "KeyR": ["R", "r"], "KeyT": ["T", "t"], "KeyY": ["Y", "y"], "KeyU": ["U", "u"], "KeyI": ["I", "i"], "KeyO": ["O", "o"], "KeyP": ["P", "p"], "BracketLeft": ["[ {", "["], "BracketRight": ["] }", "]"], "KeyA": ["A", "a"], "KeyS": ["S", "s"], "KeyD": ["D", "d"], "KeyF": ["F", "f"], "KeyG": ["G", "g"], "KeyH": ["H", "h"], "KeyJ": ["J", "j"], "KeyK": ["K", "k"], "KeyL": ["L", "l"], "Semicolon": ["; :", ";"], "Quote": ["' \"", "'"], "Backslash": ["\\ |", "\\"], "IntlBackslash": ["< >", "<", ">"], "KeyZ": ["Z", "z"], "KeyX": ["X", "x"], "KeyC": ["C", "c"], "KeyV": ["V", "v"], "KeyB": ["B", "b"], "KeyN": ["N", "n"], "KeyM": ["M", "m"], "Comma": [", <", ","], "Period": [". >", "."], "Slash": ["/ ?", "/"] } },
+            "qwerty_uk": { name: "QWERTY (UK ISO)", type: "iso", keys: { "Backquote": ["` ¬", "`"], "Digit1": ["1 !", "1"], "Digit2": ["2 \"", "2"], "Digit3": ["3 £", "3"], "Digit4": ["4 $", "4"], "Digit5": ["5 %", "5"], "Digit6": ["6 ^", "6"], "Digit7": ["7 &", "7"], "Digit8": ["8 *", "8"], "Digit9": ["9 (", "9"], "Digit0": ["0 )", "0"], "Minus": ["- _", "-"], "Equal": ["= +", "="], "KeyQ": ["Q", "q"], "KeyW": ["W", "w"], "KeyE": ["E", "e"], "KeyR": ["R", "r"], "KeyT": ["T", "t"], "KeyY": ["Y", "y"], "KeyU": ["U", "u"], "KeyI": ["I", "i"], "KeyO": ["O", "o"], "KeyP": ["P", "p"], "BracketLeft": ["[ {", "["], "BracketRight": ["] }", "]"], "KeyA": ["A", "a"], "KeyS": ["S", "s"], "KeyD": ["D", "d"], "KeyF": ["F", "f"], "KeyG": ["G", "g"], "KeyH": ["H", "h"], "KeyJ": ["J", "j"], "KeyK": ["K", "k"], "KeyL": ["L", "l"], "Semicolon": ["; :", ";"], "Quote": ["' @", "'"], "Backslash": ["# ~", "#"], "IntlBackslash": ["\\ |", "\\"], "KeyZ": ["Z", "z"], "KeyX": ["X", "x"], "KeyC": ["C", "c"], "KeyV": ["V", "v"], "KeyB": ["B", "b"], "KeyN": ["N", "n"], "KeyM": ["M", "m"], "Comma": [", <", ","], "Period": [". >", "."], "Slash": ["/ ?", "/"] } },
+            "azerty_fr": { name: "AZERTY (France)", type: "iso", keys: { "Backquote": ["²", "²"], "Digit1": ["& 1", "1", "&"], "Digit2": ["é 2", "2", "é"], "Digit3": ["\" 3", "3", "\""], "Digit4": ["' 4", "4", "'"], "Digit5": ["( 5", "5", "("], "Digit6": ["- 6", "6", "-"], "Digit7": ["è 7", "7", "è"], "Digit8": ["_ 8", "8", "_"], "Digit9": ["ç 9", "9", "ç"], "Digit0": ["à 0", "0", "à"], "Minus": [") °", ")"], "Equal": ["= +", "="], "KeyQ": ["A", "a", "q"], "KeyW": ["Z", "z", "w"], "KeyE": ["E", "e"], "KeyR": ["R", "r"], "KeyT": ["T", "t"], "KeyY": ["Y", "y"], "KeyU": ["U", "u"], "KeyI": ["I", "i"], "KeyO": ["O", "o"], "KeyP": ["P", "p"], "BracketLeft": ["^ ¨", "^", "["], "BracketRight": ["$ £", "$", "]"], "KeyA": ["Q", "q", "a"], "KeyS": ["S", "s"], "KeyD": ["D", "d"], "KeyF": ["F", "f"], "KeyG": ["G", "g"], "KeyH": ["H", "h"], "KeyJ": ["J", "j"], "KeyK": ["K", "k"], "KeyL": ["L", "l"], "Semicolon": ["M", "m", ";"], "Quote": ["ù %", "ù", "'"], "Backslash": ["* µ", "*", "\\"], "IntlBackslash": ["< >", "<", ">"], "KeyZ": ["W", "w", "z"], "KeyX": ["X", "x"], "KeyC": ["C", "c"], "KeyV": ["V", "v"], "KeyB": ["B", "b"], "KeyN": ["N", "n"], "KeyM": [", ?", ","], "Comma": ["; .", ";"], "Period": [": /", ":"], "Slash": ["! §", "!"] } },
+            "azerty_be": { name: "AZERTY (Belgium)", type: "iso", keys: { "Backquote": ["² ³", "²"], "Digit1": ["& 1", "1", "&"], "Digit2": ["é 2", "2", "é"], "Digit3": ["\" 3", "3", "\""], "Digit4": ["' 4", "4", "'"], "Digit5": ["( 5", "5", "("], "Digit6": ["§ 6", "6", "§"], "Digit7": ["è 7", "7", "è"], "Digit8": ["! 8", "8", "!"], "Digit9": ["ç 9", "9", "ç"], "Digit0": ["à 0", "0", "à"], "Minus": [") °", ")"], "Equal": ["- _", "-"], "KeyQ": ["A", "a", "q"], "KeyW": ["Z", "z", "w"], "KeyE": ["E", "e"], "KeyR": ["R", "r"], "KeyT": ["T", "t"], "KeyY": ["Y", "y"], "KeyU": ["U", "u"], "KeyI": ["I", "i"], "KeyO": ["O", "o"], "KeyP": ["P", "p"], "BracketLeft": ["^ ¨", "^", "["], "BracketRight": ["$ *", "$", "]"], "KeyA": ["Q", "q", "a"], "KeyS": ["S", "s"], "KeyD": ["D", "d"], "KeyF": ["F", "f"], "KeyG": ["G", "g"], "KeyH": ["H", "h"], "KeyJ": ["J", "j"], "KeyK": ["K", "k"], "KeyL": ["L", "l"], "Semicolon": ["M", "m", ";"], "Quote": ["ù %", "ù", "'"], "Backslash": ["µ £", "µ", "\\"], "IntlBackslash": ["< >", "<", ">"], "KeyZ": ["W", "w", "z"], "KeyX": ["X", "x"], "KeyC": ["C", "c"], "KeyV": ["V", "v"], "KeyB": ["B", "b"], "KeyN": ["N", "n"], "KeyM": [", ?", ","], "Comma": ["; .", ";"], "Period": [": /", ":"], "Slash": ["= +", "="] } },
+            "qwertz_de": { name: "QWERTZ (Germany)", type: "iso", keys: { "Backquote": ["^ °", "^"], "Digit1": ["1 !", "1"], "Digit2": ["2 \"", "2"], "Digit3": ["3 §", "3"], "Digit4": ["4 $", "4"], "Digit5": ["5 %", "5"], "Digit6": ["6 &", "6"], "Digit7": ["7 /", "7"], "Digit8": ["8 (", "8"], "Digit9": ["9 )", "9"], "Digit0": ["0 =", "0"], "Minus": ["ß ?", "ß"], "Equal": ["´ `", "´"], "KeyQ": ["Q", "q"], "KeyW": ["W", "w"], "KeyE": ["E", "e"], "KeyR": ["R", "r"], "KeyT": ["T", "t"], "KeyY": ["Z", "z", "y"], "KeyU": ["U", "u"], "KeyI": ["I", "i"], "KeyO": ["O", "o"], "KeyP": ["P", "p"], "BracketLeft": ["Ü", "ü", "["], "BracketRight": ["+ *", "+", "]"], "KeyA": ["A", "a"], "KeyS": ["S", "s"], "KeyD": ["D", "d"], "KeyF": ["F", "f"], "KeyG": ["G", "g"], "KeyH": ["H", "h"], "KeyJ": ["J", "j"], "KeyK": ["K", "k"], "KeyL": ["L", "l"], "Semicolon": ["Ö", "ö", ";"], "Quote": ["Ä", "ä", "'"], "Backslash": ["# '", "#", "\\"], "IntlBackslash": ["< >", "<", ">"], "KeyZ": ["Y", "y", "z"], "KeyX": ["X", "x"], "KeyC": ["C", "c"], "KeyV": ["V", "v"], "KeyB": ["B", "b"], "KeyN": ["N", "n"], "KeyM": ["M", "m"], "Comma": [", ;", ","], "Period": [". :", "."], "Slash": ["- _", "-"] } },
+            "qwerty_es": { name: "QWERTY (Spanish)", type: "iso", keys: { "Backquote": ["º ª", "º"], "Digit1": ["1 !", "1"], "Digit2": ["2 \"", "2"], "Digit3": ["3 ·", "3"], "Digit4": ["4 $", "4"], "Digit5": ["5 %", "5"], "Digit6": ["6 &", "6"], "Digit7": ["7 /", "7"], "Digit8": ["8 (", "8"], "Digit9": ["9 )", "9"], "Digit0": ["0 =", "0"], "Minus": ["' ?", "'"], "Equal": ["¡ ¿", "¡"], "KeyQ": ["Q", "q"], "KeyW": ["W", "w"], "KeyE": ["E", "e"], "KeyR": ["R", "r"], "KeyT": ["T", "t"], "KeyY": ["Y", "y"], "KeyU": ["U", "u"], "KeyI": ["I", "i"], "KeyO": ["O", "o"], "KeyP": ["P", "p"], "BracketLeft": ["` ^", "`", "["], "BracketRight": ["+ *", "+", "]"], "KeyA": ["A", "a"], "KeyS": ["S", "s"], "KeyD": ["D", "d"], "KeyF": ["F", "f"], "KeyG": ["G", "g"], "KeyH": ["H", "h"], "KeyJ": ["J", "j"], "KeyK": ["K", "k"], "KeyL": ["L", "l"], "Semicolon": ["Ñ", "ñ", ";"], "Quote": ["´ ¨", "´", "'"], "Backslash": ["ç Ç", "ç", "\\"], "IntlBackslash": ["< >", "<", ">"], "KeyZ": ["Z", "z"], "KeyX": ["X", "x"], "KeyC": ["C", "c"], "KeyV": ["V", "v"], "KeyB": ["B", "b"], "KeyN": ["N", "n"], "KeyM": ["M", "m"], "Comma": [", ;", ","], "Period": [". :", "."], "Slash": ["- _", "-"] } }
         };
 
-        const cfgInput = document.getElementById('cfgInput');
-        const layoutSwitch = document.getElementById('layoutSwitch');
-        const tooltip = document.getElementById('tooltip');
-        const cfgEditor = document.getElementById('cfgEditor');
-        const btnDownloadCfg = document.getElementById('btnDownloadCfg');
-        
-        let binds = {}; 
-        let loadedFileName = "cs2_binds.cfg"; 
+        // --- APP STATE ---
+        let state = {
+            compareMode: false,
+            A: { binds: {}, fileName: 'config_A.cfg', kbId: 'kbWrapA', editorId: 'editorA' },
+            B: { binds: {}, fileName: 'config_B.cfg', kbId: 'kbWrapB', editorId: 'editorB' }
+        };
 
+        // --- DOM ELEMENTS ---
+        const layoutSwitch = document.getElementById('layoutSwitch');
+        const btnToggleCompare = document.getElementById('btnToggleCompare');
+        const legendContainer = document.getElementById('legendContainer');
+        const tooltip = document.getElementById('tooltip');
+        const paneB = document.getElementById('paneB');
+
+        // Inject Keyboards
+        const template = document.getElementById('keyboardTemplate');
+        document.getElementById('kbWrapA').appendChild(template.content.cloneNode(true));
+        document.getElementById('kbWrapB').appendChild(template.content.cloneNode(true));
+
+        // Init UI
         for (const [key, layout] of Object.entries(layoutsDB)) {
             const option = document.createElement('option');
-            option.value = key;
-            option.text = layout.name;
+            option.value = key; option.text = layout.name;
             if (key === 'qwerty_us') option.selected = true;
             layoutSwitch.appendChild(option);
         }
 
-        cfgInput.addEventListener('change', function(event) {
-            const file = event.target.files[0];
-            if (!file) return;
-            
-            loadedFileName = file.name; 
-            
-            const reader = new FileReader();
-            reader.onload = function(e) {
-                cfgEditor.value = e.target.result;
-                parseCFG(e.target.result);
-                updateKeyboardBinds();
-            };
-            reader.readAsText(file);
-        });
-
-        btnDownloadCfg.addEventListener('click', function() {
-            const cfgText = cfgEditor.value;
-            const blob = new Blob([cfgText], { type: 'text/plain' });
-            const url = URL.createObjectURL(blob);
-            const a = document.createElement('a');
-            a.href = url;
-            a.download = loadedFileName;
-            document.body.appendChild(a);
-            a.click();
-            document.body.removeChild(a);
-            URL.revokeObjectURL(url);
-        });
-
-        layoutSwitch.addEventListener('change', function() {
-            updateKeyboardVisuals();
-            updateKeyboardBinds();
-        });
-
-        cfgEditor.addEventListener('input', function() {
-            parseCFG(cfgEditor.value);
-            updateKeyboardBinds();
-        });
-
-        function updateKeyboardVisuals() {
-            const currentLayout = layoutSwitch.value;
-            const layoutObj = layoutsDB[currentLayout];
-            const db = layoutObj.keys;
-            const type = layoutObj.type || "ansi";
-
-            // Toggle CSS classes to physically adjust the layout shape!
-            const mk = document.querySelector('.main-keyboard');
-            if (type === 'iso') {
-                mk.classList.remove('layout-ansi');
-                mk.classList.add('layout-iso');
+        // --- EVENT LISTENERS ---
+        layoutSwitch.addEventListener('change', updateAllVisuals);
+        
+        btnToggleCompare.addEventListener('click', () => {
+            state.compareMode = !state.compareMode;
+            if (state.compareMode) {
+                paneB.style.display = 'flex';
+                legendContainer.style.display = 'flex';
+                btnToggleCompare.innerText = "Disable Compare Mode";
             } else {
-                mk.classList.remove('layout-iso');
-                mk.classList.add('layout-ansi');
+                paneB.style.display = 'none';
+                legendContainer.style.display = 'none';
+                btnToggleCompare.innerText = "Enable Compare Mode";
             }
+            updateAllVisuals();
+        });
 
-            document.querySelectorAll('.dyn-key').forEach(key => {
-                const code = key.getAttribute('data-code');
-                if (db[code]) {
-                    key.innerText = db[code][0]; 
-                } else {
-                    key.innerText = "";
-                }
+        // Setup Panes (A and B)
+        ['A', 'B'].forEach(paneKey => {
+            const upload = document.getElementById(`upload${paneKey}`);
+            const download = document.getElementById(`download${paneKey}`);
+            const editor = document.getElementById(`editor${paneKey}`);
+
+            upload.addEventListener('change', (e) => {
+                const file = e.target.files[0];
+                if (!file) return;
+                state[paneKey].fileName = file.name;
+                document.getElementById(`title${paneKey}`).innerText = file.name; // Update displayed title
+                const reader = new FileReader();
+                reader.onload = (e) => {
+                    editor.value = e.target.result;
+                    parseEditor(paneKey);
+                    updateAllVisuals();
+                };
+                reader.readAsText(file);
+                upload.value = ''; 
             });
-        }
 
-        function parseCFG(text) {
-            binds = {}; 
+            download.addEventListener('click', () => {
+                const blob = new Blob([editor.value], { type: 'text/plain' });
+                const url = URL.createObjectURL(blob);
+                const a = document.createElement('a');
+                a.href = url; a.download = state[paneKey].fileName;
+                document.body.appendChild(a); a.click(); document.body.removeChild(a);
+            });
+
+            editor.addEventListener('input', () => {
+                parseEditor(paneKey);
+                updateAllVisuals();
+            });
+        });
+
+        // --- CORE LOGIC ---
+        function parseEditor(paneKey) {
+            const text = document.getElementById(`editor${paneKey}`).value;
+            let tempBinds = {};
             const lines = text.split('\n');
             for (let line of lines) {
                 line = line.split('//')[0].trim();
                 if (!line) continue;
                 const match = line.match(/^bind\s+"?([^"\s]+)"?\s+"?(.*?)"?$/i);
                 if (match) {
-                    binds[match[1].toLowerCase()] = match[2];
+                    tempBinds[match[1].toLowerCase()] = match[2];
                 }
             }
+            state[paneKey].binds = tempBinds;
         }
 
         function getPossibleBindNames(keyElement) {
             let possibleBinds = [];
-            const currentLayout = layoutSwitch.value;
-            const db = layoutsDB[currentLayout].keys;
-
+            const db = layoutsDB[layoutSwitch.value].keys;
             if (keyElement.classList.contains('dyn-key')) {
                 const code = keyElement.getAttribute('data-code');
                 if (scancodes[code]) possibleBinds.push(scancodes[code]);
-                if (db[code]) {
-                    possibleBinds = possibleBinds.concat(db[code].slice(1)); 
-                }
+                if (db[code]) possibleBinds = possibleBinds.concat(db[code].slice(1)); 
             } else {
                 const staticBinds = keyElement.getAttribute('data-binds');
-                if (staticBinds) {
-                    possibleBinds = possibleBinds.concat(staticBinds.split(' '));
-                }
+                if (staticBinds) possibleBinds = possibleBinds.concat(staticBinds.split(' '));
             }
             return possibleBinds;
         }
 
-        function updateKeyboardBinds() {
-            document.querySelectorAll('.key').forEach(keyElement => {
-                keyElement.classList.remove('bound');
-                keyElement.removeAttribute('data-active-bind');
+        function updateAllVisuals() {
+            const layoutObj = layoutsDB[layoutSwitch.value];
+            
+            // Adjust Physical Layout shape for both keyboards
+            ['A', 'B'].forEach(pane => {
+                const mk = document.querySelector(`#kbWrap${pane} .main-keyboard`);
+                if (layoutObj.type === 'iso') {
+                    mk.classList.remove('layout-ansi'); mk.classList.add('layout-iso');
+                } else {
+                    mk.classList.remove('layout-iso'); mk.classList.add('layout-ansi');
+                }
+                
+                // Set character text
+                document.querySelectorAll(`#kbWrap${pane} .dyn-key`).forEach(key => {
+                    const code = key.getAttribute('data-code');
+                    key.innerText = layoutObj.keys[code] ? layoutObj.keys[code][0] : "";
+                });
+            });
 
-                let possibleBinds = getPossibleBindNames(keyElement);
+            applyDiffStates();
+        }
 
-                for (let keyName of possibleBinds) {
-                    if (binds[keyName.toLowerCase()]) {
-                        keyElement.classList.add('bound');
-                        keyElement.setAttribute('data-active-bind', keyName.toLowerCase());
-                        break; 
+        function applyDiffStates() {
+            ['A', 'B'].forEach(paneKey => {
+                const otherPaneKey = paneKey === 'A' ? 'B' : 'A';
+                const myBinds = state[paneKey].binds;
+                const otherBinds = state[otherPaneKey].binds;
+                const kbWrap = document.getElementById(state[paneKey].kbId);
+
+                kbWrap.querySelectorAll('.key').forEach(keyElement => {
+                    // Reset
+                    keyElement.className = keyElement.className.replace(/bound|diff-added|diff-conflict|diff-missing|diff-match/g, '').trim();
+                    keyElement.removeAttribute('data-active-bind');
+                    keyElement.removeAttribute('data-other-val');
+
+                    const possibleBinds = getPossibleBindNames(keyElement);
+                    let myVal = null, myName = null;
+                    let otherVal = null;
+
+                    for (let name of possibleBinds) {
+                        if (myBinds[name.toLowerCase()]) {
+                            myName = name.toLowerCase();
+                            myVal = myBinds[myName];
+                            break; 
+                        }
                     }
+
+                    if (state.compareMode) {
+                        for (let name of possibleBinds) {
+                            if (otherBinds[name.toLowerCase()]) {
+                                otherVal = otherBinds[name.toLowerCase()];
+                                if (!myName) myName = name.toLowerCase(); 
+                                break; 
+                            }
+                        }
+                    }
+
+                    if (myVal) {
+                        keyElement.setAttribute('data-active-bind', myName);
+                        if (!state.compareMode) {
+                            keyElement.classList.add('bound');
+                        } else {
+                            keyElement.setAttribute('data-other-val', otherVal || '');
+                            if (!otherVal) {
+                                keyElement.classList.add('diff-added');
+                            } else if (myVal !== otherVal) {
+                                keyElement.classList.add('diff-conflict');
+                            } else {
+                                keyElement.classList.add('diff-match');
+                            }
+                        }
+                    } else if (state.compareMode && otherVal) {
+                        keyElement.setAttribute('data-active-bind', myName);
+                        keyElement.setAttribute('data-other-val', otherVal);
+                        keyElement.classList.add('diff-missing');
+                    }
+                });
+            });
+        }
+
+        // --- TOOLTIP LOGIC ---
+        document.querySelectorAll('.keyboard-wrapper').forEach(wrapper => {
+            wrapper.addEventListener('mousemove', (e) => {
+                const keyElement = e.target.closest('.key');
+                if (!keyElement || keyElement.classList.contains('hidden') || window.getComputedStyle(keyElement).display === 'none') {
+                    tooltip.style.display = 'none'; return;
+                }
+                
+                const paneKey = wrapper.id === 'kbWrapA' ? 'A' : 'B';
+                const otherPaneKey = paneKey === 'A' ? 'B' : 'A';
+                const activeName = keyElement.getAttribute('data-active-bind');
+                const myVal = activeName ? state[paneKey].binds[activeName] : null;
+                const otherVal = keyElement.getAttribute('data-other-val');
+
+                tooltip.style.left = e.clientX + 15 + 'px';
+                tooltip.style.top = e.clientY + 15 + 'px';
+                tooltip.style.display = 'block';
+
+                if (!state.compareMode) {
+                    if (myVal) tooltip.innerText = `bind "${activeName}" "${myVal}"\n\n(Click to edit)`;
+                    else tooltip.innerText = `(Click to bind)`;
+                } else {
+                    let text = `Key: "${activeName || getPossibleBindNames(keyElement)[0]}"\n\n`;
+                    text += `${state[paneKey].fileName}: ${myVal ? `"${myVal}"` : "[Unassigned]"}\n`;
+                    text += `${state[otherPaneKey].fileName}: ${otherVal ? `"${otherVal}"` : "[Unassigned]"}\n\n`;
+                    text += `(Click to edit ${state[paneKey].fileName})`;
+                    tooltip.innerText = text;
                 }
             });
-        }
 
-        function setupTooltips() {
-            document.querySelectorAll('.key').forEach(keyElement => {
-                keyElement.addEventListener('mouseenter', (e) => {
-                    if (keyElement.classList.contains('hidden') || keyElement.style.display === 'none') return;
-                    const activeKey = keyElement.getAttribute('data-active-bind');
-                    if (keyElement.classList.contains('bound') && activeKey && binds[activeKey.toLowerCase()]) {
-                        tooltip.style.display = 'block';
-                        tooltip.innerText = `bind "${activeKey}" "${binds[activeKey.toLowerCase()]}"\n\n(Click to edit)`;
-                    } else {
-                        tooltip.style.display = 'block';
-                        tooltip.innerText = `(Click to bind)`;
-                    }
-                });
-                keyElement.addEventListener('mousemove', (e) => {
-                    tooltip.style.left = e.clientX + 15 + 'px';
-                    tooltip.style.top = e.clientY + 15 + 'px';
-                });
-                keyElement.addEventListener('mouseleave', () => {
-                    tooltip.style.display = 'none';
-                });
-            });
-        }
+            wrapper.addEventListener('mouseleave', () => { tooltip.style.display = 'none'; });
+        });
 
+        // --- MODAL EDITING LOGIC ---
         const modalOverlay = document.getElementById('bindModalOverlay');
-        const modalTitle = document.getElementById('modalTitle');
-        const modalKeyInfo = document.getElementById('modalKeyInfo');
         const modalBindInput = document.getElementById('modalBindInput');
-        const btnSave = document.getElementById('btnSave');
-        const btnUnbind = document.getElementById('btnUnbind');
-        const btnCancel = document.getElementById('btnCancel');
-        let currentEditingKeyElement = null;
+        let currentEditingContext = null;
 
-        function setupModal() {
-            document.querySelectorAll('.key').forEach(keyElement => {
-                keyElement.addEventListener('click', () => {
-                    if (keyElement.classList.contains('hidden')) return;
+        document.querySelectorAll('.keyboard-wrapper').forEach(wrapper => {
+            wrapper.addEventListener('click', (e) => {
+                const keyElement = e.target.closest('.key');
+                if (!keyElement || keyElement.classList.contains('hidden') || window.getComputedStyle(keyElement).display === 'none') return;
+                
+                tooltip.style.display = 'none';
+                const paneKey = wrapper.id === 'kbWrapA' ? 'A' : 'B';
+                currentEditingContext = { keyElement, paneKey };
+                
+                let primaryName = "";
+                if (keyElement.classList.contains('dyn-key')) {
+                    const code = keyElement.getAttribute('data-code');
+                    const db = layoutsDB[layoutSwitch.value].keys;
+                    primaryName = (db[code] && db[code][1]) ? db[code][1] : scancodes[code];
+                } else {
+                    primaryName = keyElement.getAttribute('data-binds').split(' ')[0];
+                }
 
-                    currentEditingKeyElement = keyElement;
-                    tooltip.style.display = 'none';
-                    
-                    let primaryName = "";
-                    if (keyElement.classList.contains('dyn-key')) {
-                        const code = keyElement.getAttribute('data-code');
-                        const db = layoutsDB[layoutSwitch.value].keys;
-                        primaryName = (db[code] && db[code][1]) ? db[code][1] : scancodes[code];
-                    } else {
-                        primaryName = keyElement.getAttribute('data-binds').split(' ')[0];
-                    }
+                document.getElementById('modalTitle').innerText = `Edit Key: ${primaryName.toUpperCase()}`;
+                document.getElementById('modalKeyInfo').innerText = `Engine Code: "${primaryName}"`;
+                document.getElementById('modalPaneInfo').innerText = `Modifying: ${state[paneKey].fileName}`; // Update displayed filename
 
-                    let displayTitle = keyElement.innerText.split('\n')[0].trim();
-                    if (!displayTitle) displayTitle = primaryName.toUpperCase();
-
-                    modalTitle.innerText = `Edit Bind: ${displayTitle}`;
-                    modalKeyInfo.innerText = `Target Key: "${primaryName}"`;
-
-                    const activeBind = keyElement.getAttribute('data-active-bind');
-                    if (activeBind && binds[activeBind.toLowerCase()]) {
-                        modalBindInput.value = binds[activeBind.toLowerCase()];
-                    } else {
-                        modalBindInput.value = '';
-                    }
-
-                    modalOverlay.style.display = 'flex';
-                    modalBindInput.focus();
-                });
+                const myVal = state[paneKey].binds[primaryName] || keyElement.getAttribute('data-active-bind') && state[paneKey].binds[keyElement.getAttribute('data-active-bind')];
+                modalBindInput.value = myVal || '';
+                
+                modalOverlay.style.display = 'flex';
+                modalBindInput.focus();
             });
+        });
 
-            btnCancel.addEventListener('click', closeModal);
-            modalOverlay.addEventListener('click', (e) => {
-                if (e.target === modalOverlay) closeModal();
-            });
+        document.getElementById('btnCancel').addEventListener('click', () => modalOverlay.style.display = 'none');
+        modalOverlay.addEventListener('click', (e) => { if (e.target === modalOverlay) modalOverlay.style.display = 'none'; });
 
-            modalBindInput.addEventListener('keydown', (e) => {
-                if (e.key === 'Enter') btnSave.click();
-            });
+        modalBindInput.addEventListener('keydown', (e) => { if (e.key === 'Enter') document.getElementById('btnSave').click(); });
 
-            btnSave.addEventListener('click', () => {
-                if (!currentEditingKeyElement) return;
-                modifyRawCFG(currentEditingKeyElement, modalBindInput.value.trim() || null);
-            });
+        document.getElementById('btnSave').addEventListener('click', () => {
+            if (!currentEditingContext) return;
+            modifyRawCFG(currentEditingContext.keyElement, currentEditingContext.paneKey, modalBindInput.value.trim() || null);
+        });
 
-            btnUnbind.addEventListener('click', () => {
-                if (!currentEditingKeyElement) return;
-                modifyRawCFG(currentEditingKeyElement, null);
-            });
-        }
+        document.getElementById('btnUnbind').addEventListener('click', () => {
+            if (!currentEditingContext) return;
+            modifyRawCFG(currentEditingContext.keyElement, currentEditingContext.paneKey, null);
+        });
 
-        function closeModal() {
-            modalOverlay.style.display = 'none';
-            currentEditingKeyElement = null;
-            modalBindInput.value = '';
-        }
-
-        function modifyRawCFG(keyElement, newCommand) {
-            let lines = cfgEditor.value.split(/\r?\n/);
+        function modifyRawCFG(keyElement, paneKey, newCommand) {
+            const editor = document.getElementById(state[paneKey].editorId);
+            let lines = editor.value.split(/\r?\n/);
             const possibleBinds = getPossibleBindNames(keyElement).map(b => b.toLowerCase());
             
             let primaryName = "";
@@ -742,8 +607,7 @@
             }
 
             let newLines = [];
-            let bindUpdated = false;
-            let unbindInjected = false;
+            let bindUpdated = false, unbindInjected = false;
 
             for (let i = 0; i < lines.length; i++) {
                 let line = lines[i];
@@ -751,61 +615,44 @@
                 
                 if (lineTrimmed.toLowerCase().startsWith('unbind ')) {
                     const match = lineTrimmed.match(/^unbind\s+"?([^"\s]+)"?(\s*\/\/.*)?$/i);
-                    if (match) {
-                        const unboundKey = match[1].toLowerCase();
-                        if (possibleBinds.includes(unboundKey)) {
-                            continue; 
-                        }
-                    }
+                    if (match && possibleBinds.includes(match[1].toLowerCase())) continue; 
                 }
 
                 if (lineTrimmed.toLowerCase().startsWith('bind ')) {
                     const match = lineTrimmed.match(/^bind\s+"?([^"\s]+)"?\s+"?(.*?)"?(\s*\/\/.*)?$/i);
-                    if (match) {
-                        const boundKey = match[1].toLowerCase();
-                        if (possibleBinds.includes(boundKey)) {
-                            if (newCommand && !bindUpdated) {
-                                let comment = match[3] || '';
-                                newLines.push(`unbind "${primaryName}"`);
-                                newLines.push(`bind "${primaryName}" "${newCommand}"${comment}`);
-                                bindUpdated = true;
-                                unbindInjected = true;
-                            } else if (!newCommand && !unbindInjected) {
-                                newLines.push(`unbind "${primaryName}"`);
-                                unbindInjected = true;
-                            }
-                            continue;
+                    if (match && possibleBinds.includes(match[1].toLowerCase())) {
+                        if (newCommand && !bindUpdated) {
+                            let comment = match[3] || '';
+                            newLines.push(`unbind "${primaryName}"`);
+                            newLines.push(`bind "${primaryName}" "${newCommand}"${comment}`);
+                            bindUpdated = true; unbindInjected = true;
+                        } else if (!newCommand && !unbindInjected) {
+                            newLines.push(`unbind "${primaryName}"`);
+                            unbindInjected = true;
                         }
+                        continue;
                     }
                 }
                 newLines.push(line);
             }
 
             if (newCommand && !bindUpdated) {
-                if (newLines.length > 0 && newLines[newLines.length - 1].trim() !== '') {
-                    newLines.push(""); 
-                }
+                if (newLines.length > 0 && newLines[newLines.length - 1].trim() !== '') newLines.push(""); 
                 newLines.push(`unbind "${primaryName}"`);
                 newLines.push(`bind "${primaryName}" "${newCommand}"`);
             } else if (!newCommand && !unbindInjected) {
-                if (newLines.length > 0 && newLines[newLines.length - 1].trim() !== '') {
-                    newLines.push(""); 
-                }
+                if (newLines.length > 0 && newLines[newLines.length - 1].trim() !== '') newLines.push(""); 
                 newLines.push(`unbind "${primaryName}"`);
             }
 
-            const newText = newLines.join('\n');
-            cfgEditor.value = newText;
-            parseCFG(newText);
-            updateKeyboardBinds();
-            closeModal();
+            editor.value = newLines.join('\n');
+            parseEditor(paneKey);
+            updateAllVisuals();
+            modalOverlay.style.display = 'none';
         }
 
-        // INIT
-        updateKeyboardVisuals();
-        setupTooltips();
-        setupModal();
-
+        // Initialize
+        updateAllVisuals();
     </script>
 </body>
 </html>
