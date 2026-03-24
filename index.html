@@ -22,7 +22,7 @@
             border-radius: 8px;
             display: flex;
             gap: 40px;
-            align-items: center;
+            align-items: flex-end; /* Align to bottom so labels don't offset the button */
         }
 
         .control-group {
@@ -38,6 +38,24 @@
             background-color: #181825;
             color: #cdd6f4;
             cursor: pointer;
+            height: 35px;
+            box-sizing: border-box;
+        }
+
+        #btnDownloadCfg {
+            padding: 8px 20px;
+            border-radius: 4px;
+            border: none;
+            background-color: #a6e3a1;
+            color: #11111b;
+            font-weight: bold;
+            cursor: pointer;
+            height: 35px;
+            transition: background-color 0.2s;
+            box-sizing: border-box;
+        }
+        #btnDownloadCfg:hover {
+            background-color: #94cc90;
         }
 
         /* Layout wrappers */
@@ -143,7 +161,7 @@
             margin-top: 10px;
         }
 
-        /* --- NEW STYLES: Raw Editor & Modal --- */
+        /* --- STYLES: Raw Editor & Modal --- */
         .editor-section { margin-top: 40px; background-color: #313244; padding: 15px; border-radius: 8px; display: flex; flex-direction: column; gap: 10px; }
         .editor-section h3 { margin: 0; padding-bottom: 10px; border-bottom: 1px solid #45475a; }
         #cfgEditor { width: 100%; height: 250px; background-color: #11111b; color: #a6e3a1; border: 1px solid #45475a; border-radius: 6px; padding: 15px; font-family: 'Courier New', Courier, monospace; font-size: 14px; resize: vertical; box-sizing: border-box; outline: none; }
@@ -177,6 +195,10 @@
             <label for="layoutSwitch"><strong>2. Keyboard Layout Database</strong></label>
             <select id="layoutSwitch">
             </select>
+        </div>
+        <div class="control-group" style="margin-left: auto;">
+            <label><strong>3. Export Configuration</strong></label>
+            <button id="btnDownloadCfg">Download .cfg</button>
         </div>
     </div>
 
@@ -479,7 +501,10 @@
         const layoutSwitch = document.getElementById('layoutSwitch');
         const tooltip = document.getElementById('tooltip');
         const cfgEditor = document.getElementById('cfgEditor');
+        const btnDownloadCfg = document.getElementById('btnDownloadCfg');
+        
         let binds = {}; 
+        let loadedFileName = "cs2_binds.cfg"; 
 
         // Populate Layout Dropdown
         for (const [key, layout] of Object.entries(layoutsDB)) {
@@ -494,6 +519,9 @@
         cfgInput.addEventListener('change', function(event) {
             const file = event.target.files[0];
             if (!file) return;
+            
+            loadedFileName = file.name; 
+            
             const reader = new FileReader();
             reader.onload = function(e) {
                 cfgEditor.value = e.target.result;
@@ -501,6 +529,23 @@
                 updateKeyboardBinds();
             };
             reader.readAsText(file);
+        });
+
+        // Handle File Download / Save
+        btnDownloadCfg.addEventListener('click', function() {
+            const cfgText = cfgEditor.value;
+            
+            const blob = new Blob([cfgText], { type: 'text/plain' });
+            const url = URL.createObjectURL(blob);
+            const a = document.createElement('a');
+            a.href = url;
+            a.download = loadedFileName;
+            
+            document.body.appendChild(a);
+            a.click();
+            
+            document.body.removeChild(a);
+            URL.revokeObjectURL(url);
         });
 
         // Handle Layout Switch
@@ -523,7 +568,7 @@
             document.querySelectorAll('.dyn-key').forEach(key => {
                 const code = key.getAttribute('data-code');
                 if (db[code]) {
-                    key.innerText = db[code][0]; // First item is the display text
+                    key.innerText = db[code][0]; 
                 } else {
                     key.innerText = "";
                 }
@@ -555,7 +600,6 @@
 
                 let possibleBinds = getPossibleBindNames(keyElement);
 
-                // Check if any of our possible names exist in the user's CFG
                 for (let keyName of possibleBinds) {
                     if (binds[keyName.toLowerCase()]) {
                         keyElement.classList.add('bound');
@@ -566,7 +610,7 @@
             });
         }
 
-        // --- NEW CONTENT: Logic for Editor Modal & Data Manipulation ---
+        // Logic for Editor Modal & Data Manipulation
         
         function getPossibleBindNames(keyElement) {
             let possibleBinds = [];
@@ -697,24 +741,42 @@
 
             let newLines = [];
             let bindUpdated = false;
+            let unbindInjected = false;
 
             for (let i = 0; i < lines.length; i++) {
                 let line = lines[i];
                 let lineTrimmed = line.trim();
                 
+                // Match and remove old unbinds for this key so we don't spam duplicates
+                if (lineTrimmed.toLowerCase().startsWith('unbind ')) {
+                    const match = lineTrimmed.match(/^unbind\s+"?([^"\s]+)"?(\s*\/\/.*)?$/i);
+                    if (match) {
+                        const unboundKey = match[1].toLowerCase();
+                        if (possibleBinds.includes(unboundKey)) {
+                            continue; // Skip pushing this old unbind line
+                        }
+                    }
+                }
+
                 // Match lines starting with bind (case insensitive)
                 if (lineTrimmed.toLowerCase().startsWith('bind ')) {
                     const match = lineTrimmed.match(/^bind\s+"?([^"\s]+)"?\s+"?(.*?)"?(\s*\/\/.*)?$/i);
                     if (match) {
                         const boundKey = match[1].toLowerCase();
                         if (possibleBinds.includes(boundKey)) {
-                            // If user is setting a new bind, inject it cleanly here
+                            // If user is setting a new bind, inject the unbind and the new bind here
                             if (newCommand && !bindUpdated) {
                                 let comment = match[3] || '';
+                                newLines.push(`unbind "${primaryName}"`);
                                 newLines.push(`bind "${primaryName}" "${newCommand}"${comment}`);
                                 bindUpdated = true;
+                                unbindInjected = true;
+                            } else if (!newCommand && !unbindInjected) {
+                                // If user clicked Unbind, just output the unbind line and no bind line
+                                newLines.push(`unbind "${primaryName}"`);
+                                unbindInjected = true;
                             }
-                            // Do not push the old line to the new array, effectively unbinding the key
+                            // Do not push the old bind line to the new array
                             continue;
                         }
                     }
@@ -727,7 +789,14 @@
                 if (newLines.length > 0 && newLines[newLines.length - 1].trim() !== '') {
                     newLines.push(""); // Add an empty line spacing if needed
                 }
+                newLines.push(`unbind "${primaryName}"`);
                 newLines.push(`bind "${primaryName}" "${newCommand}"`);
+            } else if (!newCommand && !unbindInjected) {
+                // If they clicked unbind on a key that had nothing in the text editor
+                if (newLines.length > 0 && newLines[newLines.length - 1].trim() !== '') {
+                    newLines.push(""); 
+                }
+                newLines.push(`unbind "${primaryName}"`);
             }
 
             const newText = newLines.join('\n');
