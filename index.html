@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Ultimate CS2 Bind Visualizer - Dual Sync</title>
+    <title>Ultimate CS2 Bind & CFG Editor - Dual Sync</title>
     <style>
         body {
             font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
@@ -17,86 +17,52 @@
         h2 { border-bottom: 2px solid #313244; padding-bottom: 10px; margin-bottom: 20px; }
         
         .global-controls {
-            margin-bottom: 30px;
-            padding: 15px;
-            background-color: #313244;
-            border-radius: 8px;
-            display: flex;
-            gap: 20px;
-            align-items: flex-end;
-            flex-wrap: wrap;
+            margin-bottom: 30px; padding: 15px; background-color: #313244;
+            border-radius: 8px; display: flex; gap: 20px; align-items: flex-end; flex-wrap: wrap;
         }
 
         .control-group { display: flex; flex-direction: column; gap: 8px; }
 
-        select, input[type="file"] {
-            padding: 8px;
-            border-radius: 4px;
-            border: 1px solid #45475a;
-            background-color: #181825;
-            color: #cdd6f4;
-            cursor: pointer;
-            height: 35px;
-            box-sizing: border-box;
+        select, input[type="file"], input[type="text"] {
+            padding: 8px; border-radius: 4px; border: 1px solid #45475a;
+            background-color: #181825; color: #cdd6f4; cursor: pointer;
+            height: 35px; box-sizing: border-box; outline: none; font-family: monospace;
         }
+        input[type="text"]:focus { border-color: #89b4fa; }
+        input[type="text"] { cursor: text; }
 
         button {
-            padding: 8px 20px;
-            border-radius: 4px;
-            border: none;
-            font-weight: bold;
-            cursor: pointer;
-            height: 35px;
-            transition: all 0.2s;
-            box-sizing: border-box;
-            color: #11111b;
+            padding: 8px 20px; border-radius: 4px; border: none; font-weight: bold;
+            cursor: pointer; height: 35px; transition: all 0.2s; box-sizing: border-box; color: #11111b;
         }
 
         .btn-toggle-compare { background-color: #cba6f7; }
         .btn-toggle-compare:hover { background-color: #b4befe; }
         .btn-download { background-color: #89b4fa; }
         .btn-download:hover { background-color: #74c7ec; }
+        .btn-add { background-color: #a6e3a1; font-size: 12px; padding: 0 15px; }
+        .btn-add:hover { background-color: #94cc90; }
 
         /* --- LEGEND --- */
         .legend-container {
-            display: none;
-            background-color: #181825;
-            padding: 10px 15px;
-            border-radius: 6px;
-            border: 1px solid #45475a;
-            margin-bottom: 20px;
-            gap: 20px;
-            justify-content: center;
-            font-size: 13px;
+            display: none; background-color: #181825; padding: 10px 15px; border-radius: 6px;
+            border: 1px solid #45475a; margin-bottom: 20px; gap: 20px; justify-content: center; font-size: 13px;
         }
         .legend-item { display: flex; align-items: center; gap: 8px; font-weight: bold; }
         .legend-box { width: 16px; height: 16px; border-radius: 4px; border: 2px solid transparent; }
         
-        .c-match { background-color: #89b4fa; color: #11111b; }
-        .c-added { background-color: #a6e3a1; color: #11111b; }
-        .c-conflict { background-color: #f9e2af; color: #11111b; }
-        .c-missing { border-color: #f38ba8; background-color: transparent; }
+        /* Diff Colors */
+        .c-match { background-color: #89b4fa; color: #11111b; border-color: #74c7ec; }
+        .c-added { background-color: #a6e3a1; color: #11111b; border-color: #94cc90; }
+        .c-conflict { background-color: #f9e2af; color: #11111b; border-color: #f5c2e7; }
+        .c-missing { border-color: #f38ba8; color: #f38ba8; border-style: dashed; background-color: transparent; }
 
         /* --- DUAL PANE LAYOUT --- */
-        .split-view {
-            display: flex;
-            gap: 30px;
-            flex-wrap: wrap;
-        }
-
+        .split-view { display: flex; gap: 30px; flex-wrap: wrap; }
         .pane {
-            flex: 1;
-            min-width: 900px; 
-            background-color: #181825;
-            border: 2px solid #313244;
-            border-radius: 12px;
-            padding: 20px;
-            display: flex;
-            flex-direction: column;
-            gap: 20px;
-            transition: all 0.3s ease;
+            flex: 1; min-width: 900px; background-color: #181825; border: 2px solid #313244;
+            border-radius: 12px; padding: 20px; display: flex; flex-direction: column; gap: 20px; transition: all 0.3s ease;
         }
-
         #paneB { display: none; border-color: #cba6f7; }
 
         .pane-header { display: flex; justify-content: space-between; align-items: center; border-bottom: 1px solid #45475a; padding-bottom: 15px; }
@@ -104,19 +70,16 @@
         .pane-actions { display: flex; gap: 10px; }
 
         /* --- KEYBOARD STYLES --- */
-        .keyboard-wrapper { display: flex; gap: 20px; align-items: flex-end; flex-wrap: wrap; justify-content: center; transform-origin: top left; }
+        .keyboard-wrapper { display: flex; gap: 20px; align-items: flex-end; flex-wrap: wrap; justify-content: center; }
         .main-board-container { display: flex; flex-direction: column; gap: 15px; }
         .block { background-color: #11111b; padding: 15px; border-radius: 10px; display: flex; flex-direction: column; gap: 8px; }
         .row { display: flex; gap: 8px; justify-content: center; }
 
         .key {
-            width: 50px; height: 50px;
-            background-color: #313244; border: 2px solid #45475a; border-radius: 6px;
-            display: flex; align-items: center; justify-content: center;
-            font-weight: bold; font-size: 14px; cursor: pointer;
-            transition: all 0.2s; user-select: none; box-sizing: border-box;
-            text-align: center; white-space: pre-line; line-height: 1.2; flex-shrink: 0;
-            color: #cdd6f4;
+            width: 50px; height: 50px; background-color: #313244; border: 2px solid #45475a; border-radius: 6px;
+            display: flex; align-items: center; justify-content: center; font-weight: bold; font-size: 14px;
+            cursor: pointer; transition: all 0.2s; user-select: none; box-sizing: border-box; text-align: center;
+            white-space: pre-line; line-height: 1.2; flex-shrink: 0; color: #cdd6f4;
         }
         .key:hover { opacity: 0.8; transform: scale(1.05); z-index: 10; }
         .key.hidden { visibility: hidden; pointer-events: none; }
@@ -124,7 +87,7 @@
         /* Base bound (Normal mode) */
         .key.bound { background-color: #89b4fa; color: #11111b; border-color: #74c7ec; }
         
-        /* Compare Mode Colors */
+        /* Compare Mode Key Colors */
         .key.diff-match { background-color: #89b4fa; color: #11111b; border-color: #74c7ec; }
         .key.diff-added { background-color: #a6e3a1; color: #11111b; border-color: #94cc90; }
         .key.diff-conflict { background-color: #f9e2af; color: #11111b; border-color: #f5c2e7; }
@@ -142,50 +105,77 @@
         .layout-iso .key.enter { width: 80px; } 
 
         .numpad { display: grid; grid-template-columns: repeat(4, 50px); grid-template-rows: repeat(5, 50px); gap: 8px; background-color: #11111b; padding: 15px; border-radius: 10px; }
-        .key.tall { grid-row: span 2; height: 100%; }
-        .key.wide { grid-column: span 2; width: 100%; }
-
+        .key.tall { grid-row: span 2; height: 100%; } .key.wide { grid-column: span 2; width: 100%; }
         .section-label { font-size: 12px; color: #a6adc8; margin-bottom: -5px; text-transform: uppercase; letter-spacing: 1px; margin-top: 10px; }
+
+        /* --- COMMANDS LIST STYLES --- */
+        .commands-section { background-color: #11111b; border: 1px solid #45475a; border-radius: 8px; padding: 15px; }
+        .commands-header { display: flex; justify-content: space-between; align-items: center; border-bottom: 1px solid #313244; padding-bottom: 10px; margin-bottom: 10px; }
+        .commands-header h4 { margin: 0; color: #cdd6f4; }
+        .cmd-list { max-height: 250px; overflow-y: auto; display: flex; flex-direction: column; gap: 6px; padding-right: 5px; }
+        .cmd-item { 
+            display: flex; justify-content: space-between; padding: 8px 12px; background-color: #181825; 
+            border-radius: 4px; cursor: pointer; transition: background-color 0.2s; border-left: 4px solid #45475a; 
+            font-family: monospace; font-size: 13px; align-items: center;
+        }
+        .cmd-item:hover { background-color: #313244; }
+        .cmd-name { font-weight: bold; color: #cdd6f4; width: 40%; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+        .cmd-val { color: #a6adc8; width: 60%; text-align: right; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+        
+        /* Command Diff Colors */
+        .cmd-item.diff-match { border-left-color: #89b4fa; }
+        .cmd-item.diff-match .cmd-name { color: #89b4fa; }
+        .cmd-item.diff-added { border-left-color: #a6e3a1; }
+        .cmd-item.diff-added .cmd-name { color: #a6e3a1; }
+        .cmd-item.diff-conflict { border-left-color: #f9e2af; }
+        .cmd-item.diff-conflict .cmd-name { color: #f9e2af; }
+        .cmd-item.diff-missing { border-left-color: #f38ba8; opacity: 0.6; }
+        .cmd-item.diff-missing .cmd-name { color: #f38ba8; }
+        .cmd-item.diff-missing .cmd-val { color: #f38ba8; }
 
         /* --- TEXTAREAS --- */
         textarea {
-            width: 100%; height: 250px;
-            background-color: #11111b; color: #cdd6f4;
-            border: 1px solid #45475a; border-radius: 6px;
-            padding: 15px; font-family: 'Courier New', Courier, monospace;
-            font-size: 14px; resize: vertical; box-sizing: border-box; outline: none;
+            width: 100%; height: 250px; background-color: #11111b; color: #cdd6f4; border: 1px solid #45475a;
+            border-radius: 6px; padding: 15px; font-family: 'Courier New', Courier, monospace; font-size: 14px;
+            resize: vertical; box-sizing: border-box; outline: none;
         }
         textarea:focus { border-color: #89b4fa; }
         #editorB { color: #f5c2e7; } 
 
         /* --- TOOLTIP & MODAL --- */
         #tooltip {
-            position: fixed; background: #313244; color: #cdd6f4;
-            padding: 10px 15px; border-radius: 6px; font-weight: bold; font-family: monospace;
-            pointer-events: none; display: none; z-index: 1000;
-            box-shadow: 0 4px 15px rgba(0,0,0,0.5); border: 1px solid #cba6f7;
-            white-space: pre-wrap; word-wrap: break-word; max-width: 400px;
+            position: fixed; background: #313244; color: #cdd6f4; padding: 10px 15px; border-radius: 6px;
+            font-weight: bold; font-family: monospace; pointer-events: none; display: none; z-index: 1000;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.5); border: 1px solid #cba6f7; white-space: pre-wrap; word-wrap: break-word; max-width: 400px;
         }
 
         .modal-overlay { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(17, 17, 27, 0.8); z-index: 2000; align-items: center; justify-content: center; backdrop-filter: blur(3px); }
-        .modal { background-color: #181825; border: 2px solid #cba6f7; border-radius: 8px; padding: 25px; width: 350px; display: flex; flex-direction: column; gap: 15px; box-shadow: 0 10px 40px rgba(0,0,0,0.6); }
+        .modal { background-color: #181825; border: 2px solid #cba6f7; border-radius: 8px; padding: 25px; width: 380px; display: flex; flex-direction: column; gap: 15px; box-shadow: 0 10px 40px rgba(0,0,0,0.6); }
         .modal h3 { margin: 0; color: #cba6f7; }
         .modal p { margin: 0; font-size: 12px; color: #a6adc8; margin-top: -10px; }
-        .modal input { width: 100%; box-sizing: border-box; padding: 12px; font-family: monospace; background-color: #11111b; color: #cdd6f4; border: 1px solid #45475a; border-radius: 4px; outline: none; }
+        .modal label { font-size: 12px; color: #a6adc8; margin-bottom: -10px; font-weight: bold; text-transform: uppercase; }
+        .modal input { width: 100%; height: 40px; }
+        
         .modal-buttons { display: flex; gap: 10px; justify-content: flex-end; margin-top: 10px; }
-        .btn-save-bind { background-color: #a6e3a1 !important; color: #11111b !important; }
-        .btn-unbind { background-color: #f38ba8 !important; color: #11111b !important; margin-right: auto; }
+        .btn-save-modal { background-color: #a6e3a1 !important; color: #11111b !important; }
+        .btn-save-modal:hover { background-color: #94cc90 !important; }
+        .btn-delete-modal { background-color: #f38ba8 !important; color: #11111b !important; margin-right: auto; }
+        .btn-delete-modal:hover { background-color: #d97d96 !important; }
 
-        /* Compare Copy Button */
-        #compareQuickActions { display: none; margin-bottom: 5px; }
-        #btnCopyFromOther { width: 100%; background-color: #89b4fa; color: #11111b; font-size: 13px; padding: 10px; border-radius: 4px; transition: background-color 0.2s; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
-        #btnCopyFromOther:hover { background-color: #74c7ec; }
+        .compare-quick-actions { display: none; margin-bottom: 5px; }
+        .btn-copy-from-other { width: 100%; background-color: #89b4fa; color: #11111b; font-size: 13px; padding: 10px; border-radius: 4px; transition: background-color 0.2s; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+        .btn-copy-from-other:hover { background-color: #74c7ec; }
 
+        /* Custom Scrollbar for lists */
+        ::-webkit-scrollbar { width: 8px; }
+        ::-webkit-scrollbar-track { background: #11111b; border-radius: 4px; }
+        ::-webkit-scrollbar-thumb { background: #45475a; border-radius: 4px; }
+        ::-webkit-scrollbar-thumb:hover { background: #585b70; }
     </style>
 </head>
 <body>
 
-    <h2>Ultimate CS2 Bind Visualizer - Live Diff Mode</h2>
+    <h2>Ultimate CS2 Bind & CFG Editor - Live Diff Mode</h2>
     
     <div class="global-controls">
         <div class="control-group">
@@ -200,9 +190,9 @@
 
     <div class="legend-container" id="legendContainer">
         <div class="legend-item"><div class="legend-box c-match"></div> Match</div>
-        <div class="legend-item"><div class="legend-box c-conflict"></div> Different Action (Conflict)</div>
-        <div class="legend-item"><div class="legend-box c-added"></div> Assigned Only Here</div>
-        <div class="legend-item"><div class="legend-box c-missing"></div> Missing (Assigned in other)</div>
+        <div class="legend-item"><div class="legend-box c-conflict"></div> Different Action/Value</div>
+        <div class="legend-item"><div class="legend-box c-added"></div> Exists Only Here</div>
+        <div class="legend-item"><div class="legend-box c-missing"></div> Missing Here</div>
     </div>
 
     <div id="tooltip"></div>
@@ -216,7 +206,17 @@
                     <button class="btn-download" id="downloadA">Export File</button>
                 </div>
             </div>
+            
             <div class="keyboard-wrapper" id="kbWrapA"></div>
+            
+            <div class="commands-section">
+                <div class="commands-header">
+                    <h4>Variables & Commands</h4>
+                    <button class="btn-add" onclick="openCmdModal('A', '', '', '')">+ Add Command</button>
+                </div>
+                <div class="cmd-list" id="cmdListA"></div>
+            </div>
+
             <textarea id="editorA" spellcheck="false" placeholder="// Paste or type your config here..."></textarea>
         </div>
 
@@ -228,26 +228,59 @@
                     <button class="btn-download" id="downloadB">Export File</button>
                 </div>
             </div>
+            
             <div class="keyboard-wrapper" id="kbWrapB"></div>
+            
+            <div class="commands-section">
+                <div class="commands-header">
+                    <h4>Variables & Commands</h4>
+                    <button class="btn-add" onclick="openCmdModal('B', '', '', '')">+ Add Command</button>
+                </div>
+                <div class="cmd-list" id="cmdListB"></div>
+            </div>
+
             <textarea id="editorB" spellcheck="false" placeholder="// Paste or type your config here..."></textarea>
         </div>
     </div>
 
     <div id="bindModalOverlay" class="modal-overlay">
         <div class="modal">
-            <h3 id="modalTitle">Edit Bind</h3>
-            <p id="modalKeyInfo"></p>
-            <p id="modalPaneInfo" style="color: #f9e2af; font-weight: bold; margin-bottom: 5px;"></p>
+            <h3 id="bindModalTitle">Edit Bind</h3>
+            <p id="bindModalKeyInfo"></p>
+            <p id="bindModalPaneInfo" style="color: #f9e2af; font-weight: bold; margin-bottom: 5px;"></p>
             
-            <div id="compareQuickActions">
-                <button id="btnCopyFromOther">⏬ Copy from other config</button>
+            <div id="bindCompareQuickActions" class="compare-quick-actions">
+                <button id="btnBindCopyFromOther" class="btn-copy-from-other">⏬ Copy from other config</button>
             </div>
 
-            <input type="text" id="modalBindInput" placeholder="e.g. +jump">
+            <input type="text" id="bindModalInput" placeholder="e.g. +jump">
             <div class="modal-buttons">
-                <button id="btnUnbind" class="btn-unbind">Unbind</button>
-                <button id="btnCancel">Cancel</button>
-                <button id="btnSave" class="btn-save-bind">Save</button>
+                <button id="btnBindUnbind" class="btn-delete-modal">Unbind</button>
+                <button id="btnBindCancel">Cancel</button>
+                <button id="btnBindSave" class="btn-save-modal">Save</button>
+            </div>
+        </div>
+    </div>
+
+    <div id="cmdModalOverlay" class="modal-overlay">
+        <div class="modal">
+            <h3 id="cmdModalTitle">Edit Command</h3>
+            <p id="cmdModalPaneInfo" style="color: #f9e2af; font-weight: bold; margin-bottom: 5px;"></p>
+            
+            <div id="cmdCompareQuickActions" class="compare-quick-actions">
+                <button id="btnCmdCopyFromOther" class="btn-copy-from-other">⏬ Copy from other config</button>
+            </div>
+
+            <label>Command / Variable</label>
+            <input type="text" id="cmdModalNameInput" placeholder="e.g. sv_cheats">
+            
+            <label>Value / Arguments</label>
+            <input type="text" id="cmdModalValInput" placeholder='e.g. "1" or 1'>
+            
+            <div class="modal-buttons">
+                <button id="btnCmdDelete" class="btn-delete-modal">Delete</button>
+                <button id="btnCmdCancel">Cancel</button>
+                <button id="btnCmdSave" class="btn-save-modal">Save</button>
             </div>
         </div>
     </div>
@@ -256,32 +289,19 @@
         <div class="main-board-container">
             <div class="block f-keys">
                 <div class="row" style="justify-content: flex-start;">
-                    <div class="key static-key" data-binds="escape esc">Esc</div>
-                    <div style="width: 25px;"></div>
-                    <div class="key static-key" data-binds="f1">F1</div><div class="key static-key" data-binds="f2">F2</div><div class="key static-key" data-binds="f3">F3</div><div class="key static-key" data-binds="f4">F4</div>
-                    <div style="width: 15px;"></div>
-                    <div class="key static-key" data-binds="f5">F5</div><div class="key static-key" data-binds="f6">F6</div><div class="key static-key" data-binds="f7">F7</div><div class="key static-key" data-binds="f8">F8</div>
-                    <div style="width: 15px;"></div>
+                    <div class="key static-key" data-binds="escape esc">Esc</div><div style="width: 25px;"></div>
+                    <div class="key static-key" data-binds="f1">F1</div><div class="key static-key" data-binds="f2">F2</div><div class="key static-key" data-binds="f3">F3</div><div class="key static-key" data-binds="f4">F4</div><div style="width: 15px;"></div>
+                    <div class="key static-key" data-binds="f5">F5</div><div class="key static-key" data-binds="f6">F6</div><div class="key static-key" data-binds="f7">F7</div><div class="key static-key" data-binds="f8">F8</div><div style="width: 15px;"></div>
                     <div class="key static-key" data-binds="f9">F9</div><div class="key static-key" data-binds="f10">F10</div><div class="key static-key" data-binds="f11">F11</div><div class="key static-key" data-binds="f12">F12</div>
                 </div>
             </div>
 
             <div class="block main-keyboard layout-ansi">
-                <div class="row">
-                    <div class="key dyn-key" data-code="Backquote"></div><div class="key dyn-key" data-code="Digit1"></div><div class="key dyn-key" data-code="Digit2"></div><div class="key dyn-key" data-code="Digit3"></div><div class="key dyn-key" data-code="Digit4"></div><div class="key dyn-key" data-code="Digit5"></div><div class="key dyn-key" data-code="Digit6"></div><div class="key dyn-key" data-code="Digit7"></div><div class="key dyn-key" data-code="Digit8"></div><div class="key dyn-key" data-code="Digit9"></div><div class="key dyn-key" data-code="Digit0"></div><div class="key dyn-key" data-code="Minus"></div><div class="key dyn-key" data-code="Equal"></div><div class="key backspace static-key" data-binds="backspace">Backspace</div>
-                </div>
-                <div class="row">
-                    <div class="key tab static-key" data-binds="tab">Tab</div><div class="key dyn-key" data-code="KeyQ"></div><div class="key dyn-key" data-code="KeyW"></div><div class="key dyn-key" data-code="KeyE"></div><div class="key dyn-key" data-code="KeyR"></div><div class="key dyn-key" data-code="KeyT"></div><div class="key dyn-key" data-code="KeyY"></div><div class="key dyn-key" data-code="KeyU"></div><div class="key dyn-key" data-code="KeyI"></div><div class="key dyn-key" data-code="KeyO"></div><div class="key dyn-key" data-code="KeyP"></div><div class="key dyn-key" data-code="BracketLeft"></div><div class="key dyn-key" data-code="BracketRight"></div><div class="key dyn-key ansi-only" data-code="Backslash"></div><div class="key enter iso-only static-key" data-binds="enter return">Enter</div>
-                </div>
-                <div class="row">
-                    <div class="key caps static-key" data-binds="caps capslock">Caps</div><div class="key dyn-key" data-code="KeyA"></div><div class="key dyn-key" data-code="KeyS"></div><div class="key dyn-key" data-code="KeyD"></div><div class="key dyn-key" data-code="KeyF"></div><div class="key dyn-key" data-code="KeyG"></div><div class="key dyn-key" data-code="KeyH"></div><div class="key dyn-key" data-code="KeyJ"></div><div class="key dyn-key" data-code="KeyK"></div><div class="key dyn-key" data-code="KeyL"></div><div class="key dyn-key" data-code="Semicolon"></div><div class="key dyn-key" data-code="Quote"></div><div class="key dyn-key iso-only" data-code="Backslash"></div><div class="key enter static-key" data-binds="enter return">Enter</div>
-                </div>
-                <div class="row">
-                    <div class="key shift-l static-key" data-binds="shift">Shift</div><div class="key dyn-key iso-only" data-code="IntlBackslash"></div><div class="key dyn-key" data-code="KeyZ"></div><div class="key dyn-key" data-code="KeyX"></div><div class="key dyn-key" data-code="KeyC"></div><div class="key dyn-key" data-code="KeyV"></div><div class="key dyn-key" data-code="KeyB"></div><div class="key dyn-key" data-code="KeyN"></div><div class="key dyn-key" data-code="KeyM"></div><div class="key dyn-key" data-code="Comma"></div><div class="key dyn-key" data-code="Period"></div><div class="key dyn-key" data-code="Slash"></div><div class="key shift-r static-key" data-binds="rshift">Shift</div>
-                </div>
-                <div class="row" style="justify-content: center;">
-                    <div class="key static-key" data-binds="ctrl">Ctrl</div><div class="key static-key" data-binds="alt">Alt</div><div class="key space static-key" data-binds="space">Space</div><div class="key static-key" data-binds="altgr ralt">AltGr</div><div class="key static-key" data-binds="rctrl">Ctrl</div>
-                </div>
+                <div class="row"><div class="key dyn-key" data-code="Backquote"></div><div class="key dyn-key" data-code="Digit1"></div><div class="key dyn-key" data-code="Digit2"></div><div class="key dyn-key" data-code="Digit3"></div><div class="key dyn-key" data-code="Digit4"></div><div class="key dyn-key" data-code="Digit5"></div><div class="key dyn-key" data-code="Digit6"></div><div class="key dyn-key" data-code="Digit7"></div><div class="key dyn-key" data-code="Digit8"></div><div class="key dyn-key" data-code="Digit9"></div><div class="key dyn-key" data-code="Digit0"></div><div class="key dyn-key" data-code="Minus"></div><div class="key dyn-key" data-code="Equal"></div><div class="key backspace static-key" data-binds="backspace">Backspace</div></div>
+                <div class="row"><div class="key tab static-key" data-binds="tab">Tab</div><div class="key dyn-key" data-code="KeyQ"></div><div class="key dyn-key" data-code="KeyW"></div><div class="key dyn-key" data-code="KeyE"></div><div class="key dyn-key" data-code="KeyR"></div><div class="key dyn-key" data-code="KeyT"></div><div class="key dyn-key" data-code="KeyY"></div><div class="key dyn-key" data-code="KeyU"></div><div class="key dyn-key" data-code="KeyI"></div><div class="key dyn-key" data-code="KeyO"></div><div class="key dyn-key" data-code="KeyP"></div><div class="key dyn-key" data-code="BracketLeft"></div><div class="key dyn-key" data-code="BracketRight"></div><div class="key dyn-key ansi-only" data-code="Backslash"></div><div class="key enter iso-only static-key" data-binds="enter return">Enter</div></div>
+                <div class="row"><div class="key caps static-key" data-binds="caps capslock">Caps</div><div class="key dyn-key" data-code="KeyA"></div><div class="key dyn-key" data-code="KeyS"></div><div class="key dyn-key" data-code="KeyD"></div><div class="key dyn-key" data-code="KeyF"></div><div class="key dyn-key" data-code="KeyG"></div><div class="key dyn-key" data-code="KeyH"></div><div class="key dyn-key" data-code="KeyJ"></div><div class="key dyn-key" data-code="KeyK"></div><div class="key dyn-key" data-code="KeyL"></div><div class="key dyn-key" data-code="Semicolon"></div><div class="key dyn-key" data-code="Quote"></div><div class="key dyn-key iso-only" data-code="Backslash"></div><div class="key enter static-key" data-binds="enter return">Enter</div></div>
+                <div class="row"><div class="key shift-l static-key" data-binds="shift">Shift</div><div class="key dyn-key iso-only" data-code="IntlBackslash"></div><div class="key dyn-key" data-code="KeyZ"></div><div class="key dyn-key" data-code="KeyX"></div><div class="key dyn-key" data-code="KeyC"></div><div class="key dyn-key" data-code="KeyV"></div><div class="key dyn-key" data-code="KeyB"></div><div class="key dyn-key" data-code="KeyN"></div><div class="key dyn-key" data-code="KeyM"></div><div class="key dyn-key" data-code="Comma"></div><div class="key dyn-key" data-code="Period"></div><div class="key dyn-key" data-code="Slash"></div><div class="key shift-r static-key" data-binds="rshift">Shift</div></div>
+                <div class="row" style="justify-content: center;"><div class="key static-key" data-binds="ctrl">Ctrl</div><div class="key static-key" data-binds="alt">Alt</div><div class="key space static-key" data-binds="space">Space</div><div class="key static-key" data-binds="altgr ralt">AltGr</div><div class="key static-key" data-binds="rctrl">Ctrl</div></div>
             </div>
         </div>
         <div>
@@ -326,16 +346,14 @@
             "qwerty_us": { name: "QWERTY (US ANSI)", type: "ansi", keys: { "Backquote": ["~ `", "`", "~"], "Digit1": ["1 !", "1"], "Digit2": ["2 @", "2"], "Digit3": ["3 #", "3"], "Digit4": ["4 $", "4"], "Digit5": ["5 %", "5"], "Digit6": ["6 ^", "6"], "Digit7": ["7 &", "7"], "Digit8": ["8 *", "8"], "Digit9": ["9 (", "9"], "Digit0": ["0 )", "0"], "Minus": ["- _", "-"], "Equal": ["= +", "="], "KeyQ": ["Q", "q"], "KeyW": ["W", "w"], "KeyE": ["E", "e"], "KeyR": ["R", "r"], "KeyT": ["T", "t"], "KeyY": ["Y", "y"], "KeyU": ["U", "u"], "KeyI": ["I", "i"], "KeyO": ["O", "o"], "KeyP": ["P", "p"], "BracketLeft": ["[ {", "["], "BracketRight": ["] }", "]"], "KeyA": ["A", "a"], "KeyS": ["S", "s"], "KeyD": ["D", "d"], "KeyF": ["F", "f"], "KeyG": ["G", "g"], "KeyH": ["H", "h"], "KeyJ": ["J", "j"], "KeyK": ["K", "k"], "KeyL": ["L", "l"], "Semicolon": ["; :", ";"], "Quote": ["' \"", "'"], "Backslash": ["\\ |", "\\"], "IntlBackslash": ["< >", "<", ">"], "KeyZ": ["Z", "z"], "KeyX": ["X", "x"], "KeyC": ["C", "c"], "KeyV": ["V", "v"], "KeyB": ["B", "b"], "KeyN": ["N", "n"], "KeyM": ["M", "m"], "Comma": [", <", ","], "Period": [". >", "."], "Slash": ["/ ?", "/"] } },
             "qwerty_uk": { name: "QWERTY (UK ISO)", type: "iso", keys: { "Backquote": ["` ¬", "`"], "Digit1": ["1 !", "1"], "Digit2": ["2 \"", "2"], "Digit3": ["3 £", "3"], "Digit4": ["4 $", "4"], "Digit5": ["5 %", "5"], "Digit6": ["6 ^", "6"], "Digit7": ["7 &", "7"], "Digit8": ["8 *", "8"], "Digit9": ["9 (", "9"], "Digit0": ["0 )", "0"], "Minus": ["- _", "-"], "Equal": ["= +", "="], "KeyQ": ["Q", "q"], "KeyW": ["W", "w"], "KeyE": ["E", "e"], "KeyR": ["R", "r"], "KeyT": ["T", "t"], "KeyY": ["Y", "y"], "KeyU": ["U", "u"], "KeyI": ["I", "i"], "KeyO": ["O", "o"], "KeyP": ["P", "p"], "BracketLeft": ["[ {", "["], "BracketRight": ["] }", "]"], "KeyA": ["A", "a"], "KeyS": ["S", "s"], "KeyD": ["D", "d"], "KeyF": ["F", "f"], "KeyG": ["G", "g"], "KeyH": ["H", "h"], "KeyJ": ["J", "j"], "KeyK": ["K", "k"], "KeyL": ["L", "l"], "Semicolon": ["; :", ";"], "Quote": ["' @", "'"], "Backslash": ["# ~", "#"], "IntlBackslash": ["\\ |", "\\"], "KeyZ": ["Z", "z"], "KeyX": ["X", "x"], "KeyC": ["C", "c"], "KeyV": ["V", "v"], "KeyB": ["B", "b"], "KeyN": ["N", "n"], "KeyM": ["M", "m"], "Comma": [", <", ","], "Period": [". >", "."], "Slash": ["/ ?", "/"] } },
             "azerty_fr": { name: "AZERTY (France)", type: "iso", keys: { "Backquote": ["²", "²"], "Digit1": ["& 1", "1", "&"], "Digit2": ["é 2", "2", "é"], "Digit3": ["\" 3", "3", "\""], "Digit4": ["' 4", "4", "'"], "Digit5": ["( 5", "5", "("], "Digit6": ["- 6", "6", "-"], "Digit7": ["è 7", "7", "è"], "Digit8": ["_ 8", "8", "_"], "Digit9": ["ç 9", "9", "ç"], "Digit0": ["à 0", "0", "à"], "Minus": [") °", ")"], "Equal": ["= +", "="], "KeyQ": ["A", "a", "q"], "KeyW": ["Z", "z", "w"], "KeyE": ["E", "e"], "KeyR": ["R", "r"], "KeyT": ["T", "t"], "KeyY": ["Y", "y"], "KeyU": ["U", "u"], "KeyI": ["I", "i"], "KeyO": ["O", "o"], "KeyP": ["P", "p"], "BracketLeft": ["^ ¨", "^", "["], "BracketRight": ["$ £", "$", "]"], "KeyA": ["Q", "q", "a"], "KeyS": ["S", "s"], "KeyD": ["D", "d"], "KeyF": ["F", "f"], "KeyG": ["G", "g"], "KeyH": ["H", "h"], "KeyJ": ["J", "j"], "KeyK": ["K", "k"], "KeyL": ["L", "l"], "Semicolon": ["M", "m", ";"], "Quote": ["ù %", "ù", "'"], "Backslash": ["* µ", "*", "\\"], "IntlBackslash": ["< >", "<", ">"], "KeyZ": ["W", "w", "z"], "KeyX": ["X", "x"], "KeyC": ["C", "c"], "KeyV": ["V", "v"], "KeyB": ["B", "b"], "KeyN": ["N", "n"], "KeyM": [", ?", ","], "Comma": ["; .", ";"], "Period": [": /", ":"], "Slash": ["! §", "!"] } },
-            "azerty_be": { name: "AZERTY (Belgium)", type: "iso", keys: { "Backquote": ["² ³", "²"], "Digit1": ["& 1", "1", "&"], "Digit2": ["é 2", "2", "é"], "Digit3": ["\" 3", "3", "\""], "Digit4": ["' 4", "4", "'"], "Digit5": ["( 5", "5", "("], "Digit6": ["§ 6", "6", "§"], "Digit7": ["è 7", "7", "è"], "Digit8": ["! 8", "8", "!"], "Digit9": ["ç 9", "9", "ç"], "Digit0": ["à 0", "0", "à"], "Minus": [") °", ")"], "Equal": ["- _", "-"], "KeyQ": ["A", "a", "q"], "KeyW": ["Z", "z", "w"], "KeyE": ["E", "e"], "KeyR": ["R", "r"], "KeyT": ["T", "t"], "KeyY": ["Y", "y"], "KeyU": ["U", "u"], "KeyI": ["I", "i"], "KeyO": ["O", "o"], "KeyP": ["P", "p"], "BracketLeft": ["^ ¨", "^", "["], "BracketRight": ["$ *", "$", "]"], "KeyA": ["Q", "q", "a"], "KeyS": ["S", "s"], "KeyD": ["D", "d"], "KeyF": ["F", "f"], "KeyG": ["G", "g"], "KeyH": ["H", "h"], "KeyJ": ["J", "j"], "KeyK": ["K", "k"], "KeyL": ["L", "l"], "Semicolon": ["M", "m", ";"], "Quote": ["ù %", "ù", "'"], "Backslash": ["µ £", "µ", "\\"], "IntlBackslash": ["< >", "<", ">"], "KeyZ": ["W", "w", "z"], "KeyX": ["X", "x"], "KeyC": ["C", "c"], "KeyV": ["V", "v"], "KeyB": ["B", "b"], "KeyN": ["N", "n"], "KeyM": [", ?", ","], "Comma": ["; .", ";"], "Period": [": /", ":"], "Slash": ["= +", "="] } },
             "qwertz_de": { name: "QWERTZ (Germany)", type: "iso", keys: { "Backquote": ["^ °", "^"], "Digit1": ["1 !", "1"], "Digit2": ["2 \"", "2"], "Digit3": ["3 §", "3"], "Digit4": ["4 $", "4"], "Digit5": ["5 %", "5"], "Digit6": ["6 &", "6"], "Digit7": ["7 /", "7"], "Digit8": ["8 (", "8"], "Digit9": ["9 )", "9"], "Digit0": ["0 =", "0"], "Minus": ["ß ?", "ß"], "Equal": ["´ `", "´"], "KeyQ": ["Q", "q"], "KeyW": ["W", "w"], "KeyE": ["E", "e"], "KeyR": ["R", "r"], "KeyT": ["T", "t"], "KeyY": ["Z", "z", "y"], "KeyU": ["U", "u"], "KeyI": ["I", "i"], "KeyO": ["O", "o"], "KeyP": ["P", "p"], "BracketLeft": ["Ü", "ü", "["], "BracketRight": ["+ *", "+", "]"], "KeyA": ["A", "a"], "KeyS": ["S", "s"], "KeyD": ["D", "d"], "KeyF": ["F", "f"], "KeyG": ["G", "g"], "KeyH": ["H", "h"], "KeyJ": ["J", "j"], "KeyK": ["K", "k"], "KeyL": ["L", "l"], "Semicolon": ["Ö", "ö", ";"], "Quote": ["Ä", "ä", "'"], "Backslash": ["# '", "#", "\\"], "IntlBackslash": ["< >", "<", ">"], "KeyZ": ["Y", "y", "z"], "KeyX": ["X", "x"], "KeyC": ["C", "c"], "KeyV": ["V", "v"], "KeyB": ["B", "b"], "KeyN": ["N", "n"], "KeyM": ["M", "m"], "Comma": [", ;", ","], "Period": [". :", "."], "Slash": ["- _", "-"] } },
-            "qwerty_es": { name: "QWERTY (Spanish)", type: "iso", keys: { "Backquote": ["º ª", "º"], "Digit1": ["1 !", "1"], "Digit2": ["2 \"", "2"], "Digit3": ["3 ·", "3"], "Digit4": ["4 $", "4"], "Digit5": ["5 %", "5"], "Digit6": ["6 &", "6"], "Digit7": ["7 /", "7"], "Digit8": ["8 (", "8"], "Digit9": ["9 )", "9"], "Digit0": ["0 =", "0"], "Minus": ["' ?", "'"], "Equal": ["¡ ¿", "¡"], "KeyQ": ["Q", "q"], "KeyW": ["W", "w"], "KeyE": ["E", "e"], "KeyR": ["R", "r"], "KeyT": ["T", "t"], "KeyY": ["Y", "y"], "KeyU": ["U", "u"], "KeyI": ["I", "i"], "KeyO": ["O", "o"], "KeyP": ["P", "p"], "BracketLeft": ["` ^", "`", "["], "BracketRight": ["+ *", "+", "]"], "KeyA": ["A", "a"], "KeyS": ["S", "s"], "KeyD": ["D", "d"], "KeyF": ["F", "f"], "KeyG": ["G", "g"], "KeyH": ["H", "h"], "KeyJ": ["J", "j"], "KeyK": ["K", "k"], "KeyL": ["L", "l"], "Semicolon": ["Ñ", "ñ", ";"], "Quote": ["´ ¨", "´", "'"], "Backslash": ["ç Ç", "ç", "\\"], "IntlBackslash": ["< >", "<", ">"], "KeyZ": ["Z", "z"], "KeyX": ["X", "x"], "KeyC": ["C", "c"], "KeyV": ["V", "v"], "KeyB": ["B", "b"], "KeyN": ["N", "n"], "KeyM": ["M", "m"], "Comma": [", ;", ","], "Period": [". :", "."], "Slash": ["- _", "-"] } }
         };
 
         // --- APP STATE ---
         let state = {
             compareMode: false,
-            A: { binds: {}, fileName: 'config_A.cfg', kbId: 'kbWrapA', editorId: 'editorA' },
-            B: { binds: {}, fileName: 'config_B.cfg', kbId: 'kbWrapB', editorId: 'editorB' }
+            A: { binds: {}, cmds: {}, fileName: 'config_A.cfg', kbId: 'kbWrapA', editorId: 'editorA', listId: 'cmdListA' },
+            B: { binds: {}, cmds: {}, fileName: 'config_B.cfg', kbId: 'kbWrapB', editorId: 'editorB', listId: 'cmdListB' }
         };
 
         // --- DOM ELEMENTS ---
@@ -344,6 +362,11 @@
         const legendContainer = document.getElementById('legendContainer');
         const tooltip = document.getElementById('tooltip');
         const paneB = document.getElementById('paneB');
+
+        // Modals
+        const bindModalOverlay = document.getElementById('bindModalOverlay');
+        const cmdModalOverlay = document.getElementById('cmdModalOverlay');
+        let currentEditingContext = null; 
 
         // Inject Keyboards
         const template = document.getElementById('keyboardTemplate');
@@ -410,20 +433,69 @@
             });
         });
 
-        // --- CORE LOGIC ---
+        // --- CORE PARSER ---
         function parseEditor(paneKey) {
             const text = document.getElementById(`editor${paneKey}`).value;
             let tempBinds = {};
+            let tempCmds = {};
             const lines = text.split('\n');
+            
             for (let line of lines) {
-                line = line.split('//')[0].trim();
-                if (!line) continue;
-                const match = line.match(/^bind\s+"?([^"\s]+)"?\s+"?(.*?)"?$/i);
-                if (match) {
-                    tempBinds[match[1].toLowerCase()] = match[2];
+                let cleanLine = line.split('//')[0].trim();
+                if (!cleanLine) continue;
+                
+                // Match Bind
+                const bindMatch = cleanLine.match(/^bind\s+"?([^"\s]+)"?\s+"?(.*?)"?$/i);
+                if (bindMatch) {
+                    tempBinds[bindMatch[1].toLowerCase()] = bindMatch[2];
+                    continue;
+                }
+                
+                // Ignore unbind logic for extracting state
+                if (cleanLine.toLowerCase().startsWith('unbind ')) continue;
+
+                // Match Alias specifically to keep key distinct
+                const aliasMatch = cleanLine.match(/^alias\s+("?[^"\s]+"?)(\s+.*)?$/i);
+                if (aliasMatch) {
+                    let cmdName = "alias " + aliasMatch[1];
+                    let cmdVal = aliasMatch[2] ? aliasMatch[2].trim() : "";
+                    tempCmds[cmdName.toLowerCase()] = { originalName: cmdName, value: cmdVal };
+                    continue;
+                }
+
+                // Match Generic Commands (sv_cheats, +forward, fps_max)
+                const cmdMatch = cleanLine.match(/^([a-zA-Z0-9_+\-]+)(?:\s+(.+))?$/i);
+                if (cmdMatch) {
+                    tempCmds[cmdMatch[1].toLowerCase()] = {
+                        originalName: cmdMatch[1],
+                        value: cmdMatch[2] ? cmdMatch[2].trim() : ""
+                    };
                 }
             }
+            
             state[paneKey].binds = tempBinds;
+            state[paneKey].cmds = tempCmds;
+        }
+
+        // --- RENDER VISUALS ---
+        function updateAllVisuals() {
+            // Update Keyboards
+            const layoutObj = layoutsDB[layoutSwitch.value];
+            ['A', 'B'].forEach(pane => {
+                const mk = document.querySelector(`#kbWrap${pane} .main-keyboard`);
+                if (layoutObj.type === 'iso') {
+                    mk.classList.remove('layout-ansi'); mk.classList.add('layout-iso');
+                } else {
+                    mk.classList.remove('layout-iso'); mk.classList.add('layout-ansi');
+                }
+                document.querySelectorAll(`#kbWrap${pane} .dyn-key`).forEach(key => {
+                    const code = key.getAttribute('data-code');
+                    key.innerText = layoutObj.keys[code] ? layoutObj.keys[code][0] : "";
+                });
+            });
+
+            applyBindDiffStates();
+            renderCommands();
         }
 
         function getPossibleBindNames(keyElement) {
@@ -440,27 +512,7 @@
             return possibleBinds;
         }
 
-        function updateAllVisuals() {
-            const layoutObj = layoutsDB[layoutSwitch.value];
-            
-            ['A', 'B'].forEach(pane => {
-                const mk = document.querySelector(`#kbWrap${pane} .main-keyboard`);
-                if (layoutObj.type === 'iso') {
-                    mk.classList.remove('layout-ansi'); mk.classList.add('layout-iso');
-                } else {
-                    mk.classList.remove('layout-iso'); mk.classList.add('layout-ansi');
-                }
-                
-                document.querySelectorAll(`#kbWrap${pane} .dyn-key`).forEach(key => {
-                    const code = key.getAttribute('data-code');
-                    key.innerText = layoutObj.keys[code] ? layoutObj.keys[code][0] : "";
-                });
-            });
-
-            applyDiffStates();
-        }
-
-        function applyDiffStates() {
+        function applyBindDiffStates() {
             ['A', 'B'].forEach(paneKey => {
                 const otherPaneKey = paneKey === 'A' ? 'B' : 'A';
                 const myBinds = state[paneKey].binds;
@@ -473,14 +525,11 @@
                     keyElement.removeAttribute('data-other-val');
 
                     const possibleBinds = getPossibleBindNames(keyElement);
-                    let myVal = null, myName = null;
-                    let otherVal = null;
+                    let myVal = null, myName = null, otherVal = null;
 
                     for (let name of possibleBinds) {
                         if (myBinds[name.toLowerCase()]) {
-                            myName = name.toLowerCase();
-                            myVal = myBinds[myName];
-                            break; 
+                            myName = name.toLowerCase(); myVal = myBinds[myName]; break; 
                         }
                     }
 
@@ -500,13 +549,9 @@
                             keyElement.classList.add('bound');
                         } else {
                             keyElement.setAttribute('data-other-val', otherVal || '');
-                            if (!otherVal) {
-                                keyElement.classList.add('diff-added');
-                            } else if (myVal !== otherVal) {
-                                keyElement.classList.add('diff-conflict');
-                            } else {
-                                keyElement.classList.add('diff-match');
-                            }
+                            if (!otherVal) keyElement.classList.add('diff-added');
+                            else if (myVal !== otherVal) keyElement.classList.add('diff-conflict');
+                            else keyElement.classList.add('diff-match');
                         }
                     } else if (state.compareMode && otherVal) {
                         keyElement.setAttribute('data-active-bind', myName);
@@ -517,13 +562,57 @@
             });
         }
 
-        // --- TOOLTIP LOGIC ---
+        function renderCommands() {
+            ['A', 'B'].forEach(paneKey => {
+                const listEl = document.getElementById(state[paneKey].listId);
+                listEl.innerHTML = '';
+                
+                const myCmds = state[paneKey].cmds;
+                const otherPaneKey = paneKey === 'A' ? 'B' : 'A';
+                const otherCmds = state[otherPaneKey].cmds;
+                
+                // Merge keys
+                let keys = new Set(Object.keys(myCmds));
+                if (state.compareMode) {
+                    Object.keys(otherCmds).forEach(k => keys.add(k));
+                }
+                
+                Array.from(keys).sort().forEach(cmdKey => {
+                    const myData = myCmds[cmdKey];
+                    const otherData = otherCmds[cmdKey];
+                    
+                    if (!state.compareMode && !myData) return;
+                    
+                    const item = document.createElement('div');
+                    item.className = 'cmd-item';
+                    
+                    let displayCmd = myData ? myData.originalName : (otherData ? otherData.originalName : cmdKey);
+                    let displayVal = myData ? myData.value : "";
+                    
+                    if (state.compareMode) {
+                        if (!otherData) item.classList.add('diff-added');
+                        else if (!myData) {
+                            item.classList.add('diff-missing');
+                            displayVal = "(Missing)";
+                        }
+                        else if (myData.value !== otherData.value) item.classList.add('diff-conflict');
+                        else item.classList.add('diff-match');
+                    }
+                    
+                    item.innerHTML = `<span class="cmd-name">${displayCmd}</span><span class="cmd-val">${displayVal}</span>`;
+                    item.onclick = () => openCmdModal(paneKey, cmdKey, displayCmd, myData ? myData.value : "");
+                    listEl.appendChild(item);
+                });
+            });
+        }
+
+        // --- MODAL & TOOLTIP LOGIC ---
+
+        // Tooltips for Binds only
         document.querySelectorAll('.keyboard-wrapper').forEach(wrapper => {
             wrapper.addEventListener('mousemove', (e) => {
                 const keyElement = e.target.closest('.key');
-                if (!keyElement || keyElement.classList.contains('hidden') || window.getComputedStyle(keyElement).display === 'none') {
-                    tooltip.style.display = 'none'; return;
-                }
+                if (!keyElement || keyElement.classList.contains('hidden')) { tooltip.style.display = 'none'; return; }
                 
                 const paneKey = wrapper.id === 'kbWrapA' ? 'A' : 'B';
                 const otherPaneKey = paneKey === 'A' ? 'B' : 'A';
@@ -531,9 +620,7 @@
                 const myVal = activeName ? state[paneKey].binds[activeName] : null;
                 const otherVal = keyElement.getAttribute('data-other-val');
 
-                tooltip.style.left = e.clientX + 15 + 'px';
-                tooltip.style.top = e.clientY + 15 + 'px';
-                tooltip.style.display = 'block';
+                tooltip.style.left = e.clientX + 15 + 'px'; tooltip.style.top = e.clientY + 15 + 'px'; tooltip.style.display = 'block';
 
                 if (!state.compareMode) {
                     if (myVal) tooltip.innerText = `bind "${activeName}" "${myVal}"\n\n(Click to edit)`;
@@ -546,90 +633,114 @@
                     tooltip.innerText = text;
                 }
             });
-
             wrapper.addEventListener('mouseleave', () => { tooltip.style.display = 'none'; });
         });
 
-        // --- MODAL EDITING LOGIC ---
-        const modalOverlay = document.getElementById('bindModalOverlay');
-        const modalBindInput = document.getElementById('modalBindInput');
-        const compareQuickActions = document.getElementById('compareQuickActions');
-        const btnCopyFromOther = document.getElementById('btnCopyFromOther');
-        let currentEditingContext = null;
-
+        // Open Bind Modal
         document.querySelectorAll('.keyboard-wrapper').forEach(wrapper => {
             wrapper.addEventListener('click', (e) => {
                 const keyElement = e.target.closest('.key');
-                if (!keyElement || keyElement.classList.contains('hidden') || window.getComputedStyle(keyElement).display === 'none') return;
+                if (!keyElement || keyElement.classList.contains('hidden')) return;
                 
                 tooltip.style.display = 'none';
                 const paneKey = wrapper.id === 'kbWrapA' ? 'A' : 'B';
                 const otherPaneKey = paneKey === 'A' ? 'B' : 'A';
-                currentEditingContext = { keyElement, paneKey };
+                currentEditingContext = { type: 'bind', keyElement, paneKey };
                 
                 let primaryName = "";
                 if (keyElement.classList.contains('dyn-key')) {
                     const code = keyElement.getAttribute('data-code');
-                    const db = layoutsDB[layoutSwitch.value].keys;
-                    primaryName = (db[code] && db[code][1]) ? db[code][1] : scancodes[code];
+                    primaryName = (layoutsDB[layoutSwitch.value].keys[code] && layoutsDB[layoutSwitch.value].keys[code][1]) ? layoutsDB[layoutSwitch.value].keys[code][1] : scancodes[code];
                 } else {
                     primaryName = keyElement.getAttribute('data-binds').split(' ')[0];
                 }
 
-                document.getElementById('modalTitle').innerText = `Edit Key: ${primaryName.toUpperCase()}`;
-                document.getElementById('modalKeyInfo').innerText = `Engine Code: "${primaryName}"`;
-                document.getElementById('modalPaneInfo').innerText = `Modifying: ${state[paneKey].fileName}`; 
+                document.getElementById('bindModalTitle').innerText = `Edit Key: ${primaryName.toUpperCase()}`;
+                document.getElementById('bindModalKeyInfo').innerText = `Engine Code: "${primaryName}"`;
+                document.getElementById('bindModalPaneInfo').innerText = `Modifying: ${state[paneKey].fileName}`; 
 
-                const myVal = state[paneKey].binds[primaryName] || keyElement.getAttribute('data-active-bind') && state[paneKey].binds[keyElement.getAttribute('data-active-bind')];
-                modalBindInput.value = myVal || '';
+                const inputEl = document.getElementById('bindModalInput');
+                inputEl.value = state[paneKey].binds[primaryName] || keyElement.getAttribute('data-active-bind') && state[paneKey].binds[keyElement.getAttribute('data-active-bind')] || '';
 
-                // Check for "Copy from other config" eligibility
+                const qActions = document.getElementById('bindCompareQuickActions');
+                const btnCopy = document.getElementById('btnBindCopyFromOther');
+                
                 if (state.compareMode) {
                     let otherVal = null;
-                    const possibleBinds = getPossibleBindNames(keyElement);
-                    for (let name of possibleBinds) {
-                        if (state[otherPaneKey].binds[name.toLowerCase()]) {
-                            otherVal = state[otherPaneKey].binds[name.toLowerCase()];
-                            break;
-                        }
+                    for (let name of getPossibleBindNames(keyElement)) {
+                        if (state[otherPaneKey].binds[name.toLowerCase()]) { otherVal = state[otherPaneKey].binds[name.toLowerCase()]; break; }
                     }
-                    
                     if (otherVal) {
-                        compareQuickActions.style.display = 'block';
-                        btnCopyFromOther.innerText = `⏬ Copy from ${state[otherPaneKey].fileName} ("${otherVal}")`;
-                        btnCopyFromOther.onclick = (event) => {
-                            event.preventDefault();
-                            modalBindInput.value = otherVal;
-                            document.getElementById('btnSave').click(); // Auto-save on click
-                        };
-                    } else {
-                        compareQuickActions.style.display = 'none';
-                    }
-                } else {
-                    compareQuickActions.style.display = 'none';
-                }
+                        qActions.style.display = 'block';
+                        btnCopy.innerText = `⏬ Copy from ${state[otherPaneKey].fileName} ("${otherVal}")`;
+                        btnCopy.onclick = (event) => { event.preventDefault(); inputEl.value = otherVal; document.getElementById('btnBindSave').click(); };
+                    } else { qActions.style.display = 'none'; }
+                } else { qActions.style.display = 'none'; }
                 
-                modalOverlay.style.display = 'flex';
-                modalBindInput.focus();
+                bindModalOverlay.style.display = 'flex';
+                inputEl.focus();
             });
         });
 
-        document.getElementById('btnCancel').addEventListener('click', () => modalOverlay.style.display = 'none');
-        modalOverlay.addEventListener('click', (e) => { if (e.target === modalOverlay) modalOverlay.style.display = 'none'; });
+        // Open Command Modal
+        window.openCmdModal = function(paneKey, cmdKey, currentName, currentVal) {
+            currentEditingContext = { type: 'cmd', paneKey, oldCmdKey: cmdKey };
+            const otherPaneKey = paneKey === 'A' ? 'B' : 'A';
+            
+            document.getElementById('cmdModalTitle').innerText = cmdKey ? 'Edit Command' : 'Add Command';
+            document.getElementById('cmdModalPaneInfo').innerText = `Modifying: ${state[paneKey].fileName}`; 
+            
+            const nameInput = document.getElementById('cmdModalNameInput');
+            const valInput = document.getElementById('cmdModalValInput');
+            nameInput.value = currentName;
+            valInput.value = currentVal;
+            
+            const qActions = document.getElementById('cmdCompareQuickActions');
+            const btnCopy = document.getElementById('btnCmdCopyFromOther');
+            const otherData = state[otherPaneKey].cmds[cmdKey];
 
-        modalBindInput.addEventListener('keydown', (e) => { if (e.key === 'Enter') document.getElementById('btnSave').click(); });
+            if (state.compareMode && otherData) {
+                qActions.style.display = 'block';
+                btnCopy.innerText = `⏬ Copy from ${state[otherPaneKey].fileName} (${otherData.value ? `"${otherData.value}"` : 'No Value'})`;
+                btnCopy.onclick = (event) => { 
+                    event.preventDefault(); 
+                    nameInput.value = otherData.originalName;
+                    valInput.value = otherData.value;
+                    document.getElementById('btnCmdSave').click(); 
+                };
+            } else { qActions.style.display = 'none'; }
+            
+            cmdModalOverlay.style.display = 'flex';
+            cmdKey ? valInput.focus() : nameInput.focus();
+        };
 
-        document.getElementById('btnSave').addEventListener('click', () => {
-            if (!currentEditingContext) return;
-            modifyRawCFG(currentEditingContext.keyElement, currentEditingContext.paneKey, modalBindInput.value.trim() || null);
+        // Close Modals
+        document.getElementById('btnBindCancel').addEventListener('click', () => bindModalOverlay.style.display = 'none');
+        document.getElementById('btnCmdCancel').addEventListener('click', () => cmdModalOverlay.style.display = 'none');
+        bindModalOverlay.addEventListener('click', (e) => { if (e.target === bindModalOverlay) bindModalOverlay.style.display = 'none'; });
+        cmdModalOverlay.addEventListener('click', (e) => { if (e.target === cmdModalOverlay) cmdModalOverlay.style.display = 'none'; });
+
+        // Save Actions
+        document.getElementById('btnBindSave').addEventListener('click', () => {
+            modifyBindCFG(currentEditingContext.keyElement, currentEditingContext.paneKey, document.getElementById('bindModalInput').value.trim() || null);
+        });
+        document.getElementById('btnBindUnbind').addEventListener('click', () => {
+            modifyBindCFG(currentEditingContext.keyElement, currentEditingContext.paneKey, null);
         });
 
-        document.getElementById('btnUnbind').addEventListener('click', () => {
-            if (!currentEditingContext) return;
-            modifyRawCFG(currentEditingContext.keyElement, currentEditingContext.paneKey, null);
+        document.getElementById('btnCmdSave').addEventListener('click', () => {
+            const newName = document.getElementById('cmdModalNameInput').value.trim();
+            const newVal = document.getElementById('cmdModalValInput').value.trim();
+            if(!newName) return; // Prevent empty command
+            modifyCmdCFG(currentEditingContext.paneKey, currentEditingContext.oldCmdKey, newName, newVal, false);
+        });
+        document.getElementById('btnCmdDelete').addEventListener('click', () => {
+            modifyCmdCFG(currentEditingContext.paneKey, currentEditingContext.oldCmdKey, "", "", true);
         });
 
-        function modifyRawCFG(keyElement, paneKey, newCommand) {
+        // --- FILE MODIFICATION LOGIC ---
+        
+        function modifyBindCFG(keyElement, paneKey, newCommand) {
             const editor = document.getElementById(state[paneKey].editorId);
             let lines = editor.value.split(/\r?\n/);
             const possibleBinds = getPossibleBindNames(keyElement).map(b => b.toLowerCase());
@@ -637,8 +748,7 @@
             let primaryName = "";
             if (keyElement.classList.contains('dyn-key')) {
                 const code = keyElement.getAttribute('data-code');
-                const db = layoutsDB[layoutSwitch.value].keys;
-                primaryName = (db[code] && db[code][1]) ? db[code][1] : scancodes[code];
+                primaryName = (layoutsDB[layoutSwitch.value].keys[code] && layoutsDB[layoutSwitch.value].keys[code][1]) ? layoutsDB[layoutSwitch.value].keys[code][1] : scancodes[code];
             } else {
                 primaryName = keyElement.getAttribute('data-binds').split(' ')[0];
             }
@@ -647,8 +757,7 @@
             let bindUpdated = false, unbindInjected = false;
 
             for (let i = 0; i < lines.length; i++) {
-                let line = lines[i];
-                let lineTrimmed = line.trim();
+                let lineTrimmed = lines[i].trim();
                 
                 if (lineTrimmed.toLowerCase().startsWith('unbind ')) {
                     const match = lineTrimmed.match(/^unbind\s+"?([^"\s]+)"?(\s*\/\/.*)?$/i);
@@ -670,7 +779,7 @@
                         continue;
                     }
                 }
-                newLines.push(line);
+                newLines.push(lines[i]);
             }
 
             if (newCommand && !bindUpdated) {
@@ -685,10 +794,63 @@
             editor.value = newLines.join('\n');
             parseEditor(paneKey);
             updateAllVisuals();
-            modalOverlay.style.display = 'none';
+            bindModalOverlay.style.display = 'none';
         }
 
-        // Initialize
+        function modifyCmdCFG(paneKey, oldCmdKey, newCmdName, newValue, isDelete) {
+            const editor = document.getElementById(state[paneKey].editorId);
+            let lines = editor.value.split(/\r?\n/);
+            let newLines = [];
+            let updated = false;
+
+            // Define matcher based on if oldCmdKey is an alias
+            const isAlias = oldCmdKey && oldCmdKey.startsWith("alias ");
+            const targetAliasName = isAlias ? oldCmdKey.substring(6).replace(/['"]/g, '').toLowerCase() : null;
+
+            for (let i = 0; i < lines.length; i++) {
+                let line = lines[i];
+                let cleanLine = line.split('//')[0].trim();
+                let match = false;
+
+                if (oldCmdKey) {
+                    if (isAlias) {
+                        const aMatch = cleanLine.match(/^alias\s+("?[^"\s]+"?)(\s+.*)?$/i);
+                        if (aMatch && aMatch[1].replace(/['"]/g, '').toLowerCase() === targetAliasName) match = true;
+                    } else {
+                        const cMatch = cleanLine.match(/^([a-zA-Z0-9_+\-]+)/i);
+                        if (cMatch && cMatch[1].toLowerCase() === oldCmdKey.toLowerCase()) match = true;
+                    }
+                }
+
+                if (match) {
+                    if (isDelete) {
+                        updated = true; continue; // Drop line
+                    } else if (!updated) {
+                        let commentMatch = line.match(/(\/\/.*)$/);
+                        let comment = commentMatch ? ' ' + commentMatch[1] : '';
+                        let newLineStr = newValue ? `${newCmdName} ${newValue}` : newCmdName;
+                        newLines.push(newLineStr + comment);
+                        updated = true;
+                        continue;
+                    } else {
+                        continue; // If duplicates exist, delete extras
+                    }
+                }
+                newLines.push(line);
+            }
+
+            if (!isDelete && !updated && newCmdName) {
+                if (newLines.length > 0 && newLines[newLines.length - 1].trim() !== '') newLines.push("");
+                newLines.push(newValue ? `${newCmdName} ${newValue}` : newCmdName);
+            }
+
+            editor.value = newLines.join('\n');
+            parseEditor(paneKey);
+            updateAllVisuals();
+            cmdModalOverlay.style.display = 'none';
+        }
+
+        // Initialize App
         updateAllVisuals();
     </script>
 </body>
