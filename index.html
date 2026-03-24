@@ -10,6 +10,7 @@
             padding: 20px;
             background-color: #1e1e2e;
             color: #cdd6f4;
+            padding-bottom: 50px;
         }
         
         h2 { border-bottom: 2px solid #313244; padding-bottom: 10px; margin-bottom: 20px; }
@@ -86,7 +87,7 @@
             line-height: 1.2;
         }
         .key:hover { background-color: #45475a; }
-        .key.hidden { visibility: hidden; }
+        .key.hidden { visibility: hidden; pointer-events: none; }
 
         /* Highlight bound keys */
         .key.bound {
@@ -141,6 +142,26 @@
             letter-spacing: 1px;
             margin-top: 10px;
         }
+
+        /* --- NEW STYLES: Raw Editor & Modal --- */
+        .editor-section { margin-top: 40px; background-color: #313244; padding: 15px; border-radius: 8px; display: flex; flex-direction: column; gap: 10px; }
+        .editor-section h3 { margin: 0; padding-bottom: 10px; border-bottom: 1px solid #45475a; }
+        #cfgEditor { width: 100%; height: 250px; background-color: #11111b; color: #a6e3a1; border: 1px solid #45475a; border-radius: 6px; padding: 15px; font-family: 'Courier New', Courier, monospace; font-size: 14px; resize: vertical; box-sizing: border-box; outline: none; }
+        #cfgEditor:focus { border-color: #cba6f7; }
+
+        .modal-overlay { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(17, 17, 27, 0.8); z-index: 2000; align-items: center; justify-content: center; backdrop-filter: blur(3px); }
+        .modal { background-color: #181825; border: 2px solid #cba6f7; border-radius: 8px; padding: 25px; width: 350px; display: flex; flex-direction: column; gap: 15px; box-shadow: 0 10px 40px rgba(0,0,0,0.6); }
+        .modal h3 { margin: 0; color: #cba6f7; border: none; padding: 0; }
+        .modal p { margin: 0; font-size: 12px; color: #a6adc8; margin-top: -10px; }
+        .modal input { width: 100%; box-sizing: border-box; padding: 12px; font-family: 'Courier New', Courier, monospace; background-color: #11111b; color: #cdd6f4; border: 1px solid #45475a; border-radius: 4px; outline: none; }
+        .modal input:focus { border-color: #89b4fa; }
+        .modal-buttons { display: flex; gap: 10px; justify-content: flex-end; margin-top: 10px; }
+        .modal-buttons button { padding: 10px 15px; border: none; border-radius: 4px; cursor: pointer; font-weight: bold; background-color: #313244; color: #cdd6f4; transition: background-color 0.2s; }
+        .modal-buttons button:hover { background-color: #45475a; }
+        .modal-buttons button#btnSave { background-color: #a6e3a1; color: #11111b; }
+        .modal-buttons button#btnSave:hover { background-color: #94cc90; }
+        .modal-buttons button#btnUnbind { background-color: #f38ba8; color: #11111b; margin-right: auto; }
+        .modal-buttons button#btnUnbind:hover { background-color: #d97d96; }
     </style>
 </head>
 <body>
@@ -155,7 +176,7 @@
         <div class="control-group">
             <label for="layoutSwitch"><strong>2. Keyboard Layout Database</strong></label>
             <select id="layoutSwitch">
-                </select>
+            </select>
         </div>
     </div>
 
@@ -332,9 +353,26 @@
         </div>
     </div>
 
+    <div class="editor-section">
+        <h3>Raw Configuration File</h3>
+        <textarea id="cfgEditor" spellcheck="false" placeholder="// Upload a file, start typing here, or click a key above to generate binds..."></textarea>
+    </div>
+
+    <div id="bindModalOverlay" class="modal-overlay">
+        <div class="modal">
+            <h3 id="modalTitle">Edit Bind</h3>
+            <p id="modalKeyInfo"></p>
+            <input type="text" id="modalBindInput" placeholder="e.g. +jump">
+            <div class="modal-buttons">
+                <button id="btnUnbind">Unbind</button>
+                <button id="btnCancel">Cancel</button>
+                <button id="btnSave">Save</button>
+            </div>
+        </div>
+    </div>
+
     <script>
         // --- 1. CS2 SCANCODE DATABASE ---
-        // These represent the physical hardware keys, CS2 understands these universally.
         const scancodes = {
             "Backquote": "scancode53", "Digit1": "scancode30", "Digit2": "scancode31", "Digit3": "scancode32", "Digit4": "scancode33", "Digit5": "scancode34", "Digit6": "scancode35", "Digit7": "scancode36", "Digit8": "scancode37", "Digit9": "scancode38", "Digit0": "scancode39", "Minus": "scancode45", "Equal": "scancode46",
             "KeyQ": "scancode20", "KeyW": "scancode26", "KeyE": "scancode8", "KeyR": "scancode21", "KeyT": "scancode23", "KeyY": "scancode28", "KeyU": "scancode24", "KeyI": "scancode12", "KeyO": "scancode18", "KeyP": "scancode19", "BracketLeft": "scancode47", "BracketRight": "scancode48",
@@ -343,7 +381,6 @@
         };
 
         // --- 2. LAYOUT DICTIONARY DATABASE ---
-        // Format: "KeyName": ["Display Text", "primary_char_bind", "secondary_char_bind"]
         const layoutsDB = {
             "qwerty_us": {
                 name: "QWERTY (US ANSI)",
@@ -441,6 +478,7 @@
         const cfgInput = document.getElementById('cfgInput');
         const layoutSwitch = document.getElementById('layoutSwitch');
         const tooltip = document.getElementById('tooltip');
+        const cfgEditor = document.getElementById('cfgEditor');
         let binds = {}; 
 
         // Populate Layout Dropdown
@@ -452,36 +490,13 @@
             layoutSwitch.appendChild(option);
         }
 
-        // Initialize view
-        updateKeyboardVisuals();
-        setupTooltips();
-
-        // Handle tooltips
-        function setupTooltips() {
-            document.querySelectorAll('.key').forEach(keyElement => {
-                keyElement.addEventListener('mouseenter', (e) => {
-                    const activeKey = keyElement.getAttribute('data-active-bind');
-                    if (keyElement.classList.contains('bound') && activeKey && binds[activeKey]) {
-                        tooltip.style.display = 'block';
-                        tooltip.innerText = `bind "${activeKey}" "${binds[activeKey]}"`;
-                    }
-                });
-                keyElement.addEventListener('mousemove', (e) => {
-                    tooltip.style.left = e.clientX + 15 + 'px';
-                    tooltip.style.top = e.clientY + 15 + 'px';
-                });
-                keyElement.addEventListener('mouseleave', () => {
-                    tooltip.style.display = 'none';
-                });
-            });
-        }
-
         // Handle File Upload
         cfgInput.addEventListener('change', function(event) {
             const file = event.target.files[0];
             if (!file) return;
             const reader = new FileReader();
             reader.onload = function(e) {
+                cfgEditor.value = e.target.result;
                 parseCFG(e.target.result);
                 updateKeyboardBinds();
             };
@@ -491,6 +506,12 @@
         // Handle Layout Switch
         layoutSwitch.addEventListener('change', function() {
             updateKeyboardVisuals();
+            updateKeyboardBinds();
+        });
+
+        // Handle Textarea direct typing
+        cfgEditor.addEventListener('input', function() {
+            parseCFG(cfgEditor.value);
             updateKeyboardBinds();
         });
 
@@ -509,7 +530,7 @@
             });
         }
 
-        // Parse CS2 CFG (with scancode awareness)
+        // Parse CS2 CFG
         function parseCFG(text) {
             binds = {}; 
             const lines = text.split('\n');
@@ -532,36 +553,195 @@
                 keyElement.classList.remove('bound');
                 keyElement.removeAttribute('data-active-bind');
 
-                let possibleBinds = [];
-
-                if (keyElement.classList.contains('dyn-key')) {
-                    const code = keyElement.getAttribute('data-code');
-                    // Add physical hardware scancode
-                    if (scancodes[code]) possibleBinds.push(scancodes[code]);
-                    
-                    // Add all possible text character mappings for this layout
-                    if (db[code]) {
-                        // Slice from index 1 to end (ignoring display text at index 0)
-                        possibleBinds = possibleBinds.concat(db[code].slice(1)); 
-                    }
-                } else {
-                    // Static keys (F-keys, Numpad, Mouse)
-                    const staticBinds = keyElement.getAttribute('data-binds');
-                    if (staticBinds) {
-                        possibleBinds = possibleBinds.concat(staticBinds.split(' '));
-                    }
-                }
+                let possibleBinds = getPossibleBindNames(keyElement);
 
                 // Check if any of our possible names exist in the user's CFG
                 for (let keyName of possibleBinds) {
-                    if (binds[keyName]) {
+                    if (binds[keyName.toLowerCase()]) {
                         keyElement.classList.add('bound');
-                        keyElement.setAttribute('data-active-bind', keyName);
+                        keyElement.setAttribute('data-active-bind', keyName.toLowerCase());
                         break; 
                     }
                 }
             });
         }
+
+        // --- NEW CONTENT: Logic for Editor Modal & Data Manipulation ---
+        
+        function getPossibleBindNames(keyElement) {
+            let possibleBinds = [];
+            const currentLayout = layoutSwitch.value;
+            const db = layoutsDB[currentLayout].keys;
+
+            if (keyElement.classList.contains('dyn-key')) {
+                const code = keyElement.getAttribute('data-code');
+                if (scancodes[code]) possibleBinds.push(scancodes[code]);
+                if (db[code]) {
+                    possibleBinds = possibleBinds.concat(db[code].slice(1)); 
+                }
+            } else {
+                const staticBinds = keyElement.getAttribute('data-binds');
+                if (staticBinds) {
+                    possibleBinds = possibleBinds.concat(staticBinds.split(' '));
+                }
+            }
+            return possibleBinds;
+        }
+
+        function setupTooltips() {
+            document.querySelectorAll('.key').forEach(keyElement => {
+                keyElement.addEventListener('mouseenter', (e) => {
+                    if (keyElement.classList.contains('hidden')) return;
+                    const activeKey = keyElement.getAttribute('data-active-bind');
+                    if (keyElement.classList.contains('bound') && activeKey && binds[activeKey.toLowerCase()]) {
+                        tooltip.style.display = 'block';
+                        tooltip.innerText = `bind "${activeKey}" "${binds[activeKey.toLowerCase()]}"\n\n(Click to edit)`;
+                    } else {
+                        tooltip.style.display = 'block';
+                        tooltip.innerText = `(Click to bind)`;
+                    }
+                });
+                keyElement.addEventListener('mousemove', (e) => {
+                    tooltip.style.left = e.clientX + 15 + 'px';
+                    tooltip.style.top = e.clientY + 15 + 'px';
+                });
+                keyElement.addEventListener('mouseleave', () => {
+                    tooltip.style.display = 'none';
+                });
+            });
+        }
+
+        const modalOverlay = document.getElementById('bindModalOverlay');
+        const modalTitle = document.getElementById('modalTitle');
+        const modalKeyInfo = document.getElementById('modalKeyInfo');
+        const modalBindInput = document.getElementById('modalBindInput');
+        const btnSave = document.getElementById('btnSave');
+        const btnUnbind = document.getElementById('btnUnbind');
+        const btnCancel = document.getElementById('btnCancel');
+        let currentEditingKeyElement = null;
+
+        function setupModal() {
+            document.querySelectorAll('.key').forEach(keyElement => {
+                keyElement.addEventListener('click', () => {
+                    if (keyElement.classList.contains('hidden')) return;
+
+                    currentEditingKeyElement = keyElement;
+                    tooltip.style.display = 'none';
+                    
+                    let primaryName = "";
+                    if (keyElement.classList.contains('dyn-key')) {
+                        const code = keyElement.getAttribute('data-code');
+                        const db = layoutsDB[layoutSwitch.value].keys;
+                        primaryName = (db[code] && db[code][1]) ? db[code][1] : scancodes[code];
+                    } else {
+                        primaryName = keyElement.getAttribute('data-binds').split(' ')[0];
+                    }
+
+                    let displayTitle = keyElement.innerText.split('\n')[0].trim();
+                    if (!displayTitle) displayTitle = primaryName.toUpperCase();
+
+                    modalTitle.innerText = `Edit Bind: ${displayTitle}`;
+                    modalKeyInfo.innerText = `Target Key: "${primaryName}"`;
+
+                    const activeBind = keyElement.getAttribute('data-active-bind');
+                    if (activeBind && binds[activeBind.toLowerCase()]) {
+                        modalBindInput.value = binds[activeBind.toLowerCase()];
+                    } else {
+                        modalBindInput.value = '';
+                    }
+
+                    modalOverlay.style.display = 'flex';
+                    modalBindInput.focus();
+                });
+            });
+
+            btnCancel.addEventListener('click', closeModal);
+            modalOverlay.addEventListener('click', (e) => {
+                if (e.target === modalOverlay) closeModal();
+            });
+
+            modalBindInput.addEventListener('keydown', (e) => {
+                if (e.key === 'Enter') btnSave.click();
+            });
+
+            btnSave.addEventListener('click', () => {
+                if (!currentEditingKeyElement) return;
+                modifyRawCFG(currentEditingKeyElement, modalBindInput.value.trim() || null);
+            });
+
+            btnUnbind.addEventListener('click', () => {
+                if (!currentEditingKeyElement) return;
+                modifyRawCFG(currentEditingKeyElement, null);
+            });
+        }
+
+        function closeModal() {
+            modalOverlay.style.display = 'none';
+            currentEditingKeyElement = null;
+            modalBindInput.value = '';
+        }
+
+        // Modify the configuration inside the raw text window without destroying comments or formatting
+        function modifyRawCFG(keyElement, newCommand) {
+            let lines = cfgEditor.value.split(/\r?\n/);
+            const possibleBinds = getPossibleBindNames(keyElement).map(b => b.toLowerCase());
+            
+            let primaryName = "";
+            if (keyElement.classList.contains('dyn-key')) {
+                const code = keyElement.getAttribute('data-code');
+                const db = layoutsDB[layoutSwitch.value].keys;
+                primaryName = (db[code] && db[code][1]) ? db[code][1] : scancodes[code];
+            } else {
+                primaryName = keyElement.getAttribute('data-binds').split(' ')[0];
+            }
+
+            let newLines = [];
+            let bindUpdated = false;
+
+            for (let i = 0; i < lines.length; i++) {
+                let line = lines[i];
+                let lineTrimmed = line.trim();
+                
+                // Match lines starting with bind (case insensitive)
+                if (lineTrimmed.toLowerCase().startsWith('bind ')) {
+                    const match = lineTrimmed.match(/^bind\s+"?([^"\s]+)"?\s+"?(.*?)"?(\s*\/\/.*)?$/i);
+                    if (match) {
+                        const boundKey = match[1].toLowerCase();
+                        if (possibleBinds.includes(boundKey)) {
+                            // If user is setting a new bind, inject it cleanly here
+                            if (newCommand && !bindUpdated) {
+                                let comment = match[3] || '';
+                                newLines.push(`bind "${primaryName}" "${newCommand}"${comment}`);
+                                bindUpdated = true;
+                            }
+                            // Do not push the old line to the new array, effectively unbinding the key
+                            continue;
+                        }
+                    }
+                }
+                newLines.push(line);
+            }
+
+            // If the bind didn't exist in the file previously, append it to the bottom
+            if (newCommand && !bindUpdated) {
+                if (newLines.length > 0 && newLines[newLines.length - 1].trim() !== '') {
+                    newLines.push(""); // Add an empty line spacing if needed
+                }
+                newLines.push(`bind "${primaryName}" "${newCommand}"`);
+            }
+
+            const newText = newLines.join('\n');
+            cfgEditor.value = newText;
+            parseCFG(newText);
+            updateKeyboardBinds();
+            closeModal();
+        }
+
+        // Initialize view
+        updateKeyboardVisuals();
+        setupTooltips();
+        setupModal();
+
     </script>
 </body>
 </html>
