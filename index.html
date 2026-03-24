@@ -22,7 +22,7 @@
             border-radius: 8px;
             display: flex;
             gap: 40px;
-            align-items: flex-end; /* Align to bottom so labels don't offset the button */
+            align-items: flex-end;
         }
 
         .control-group {
@@ -58,7 +58,6 @@
             background-color: #94cc90;
         }
 
-        /* Layout wrappers */
         .keyboard-wrapper {
             display: flex;
             gap: 20px;
@@ -72,7 +71,6 @@
             gap: 15px;
         }
 
-        /* Blocks */
         .block {
             background-color: #181825;
             padding: 15px;
@@ -84,7 +82,6 @@
         
         .row { display: flex; gap: 8px; justify-content: center; }
 
-        /* Key Styles */
         .key {
             width: 50px;
             height: 50px;
@@ -103,11 +100,11 @@
             text-align: center;
             white-space: pre-line;
             line-height: 1.2;
+            flex-shrink: 0; /* Prevents shrinking on tight grids */
         }
         .key:hover { background-color: #45475a; }
         .key.hidden { visibility: hidden; pointer-events: none; }
 
-        /* Highlight bound keys */
         .key.bound {
             background-color: #89b4fa;
             color: #11111b;
@@ -115,14 +112,35 @@
         }
         .key.bound:hover { background-color: #b4befe; }
         
-        /* Special Keys */
-        .key.tab { width: 75px; }
-        .key.caps { width: 90px; }
-        .key.shift { width: 115px; }
-        .key.space { width: 300px; }
-        .key.enter { width: 90px; }
+        /* --- DYNAMIC KEYBOARD SHAPE STYLES --- */
+        .main-keyboard .row {
+            justify-content: flex-start; 
+            width: 870px; /* Fixed width to force alignment */
+        }
+        
+        /* Auto-fill the end of rows */
+        .main-keyboard .row .key:last-child {
+            flex-grow: 1; 
+            max-width: 140px; 
+        }
+        
+        /* Default Sizes */
+        .key.backspace { width: 100px; }
+        .key.tab { width: 80px; }
+        .key.caps { width: 95px; }
+        .key.enter { width: 100px; }
+        .key.shift-l { width: 125px; }
+        .key.shift-r { width: 125px; }
+        .key.space { width: 350px; }
 
-        /* Numpad */
+        /* Dynamic Layout Toggles */
+        .layout-ansi .iso-only { display: none !important; }
+        .layout-iso .ansi-only { display: none !important; }
+
+        .layout-iso .key.shift-l { width: 50px; } /* Short shift */
+        .layout-iso .key.enter { width: 80px; } /* Bottom of ISO enter */
+
+        /* Numpad & Others */
         .numpad {
             display: grid;
             grid-template-columns: repeat(4, 50px);
@@ -135,7 +153,6 @@
         .key.tall { grid-row: span 2; height: 100%; }
         .key.wide { grid-column: span 2; width: 100%; }
         
-        /* Tooltip */
         #tooltip {
             position: fixed;
             background: #f9e2af;
@@ -152,16 +169,9 @@
             max-width: 350px;
         }
 
-        .section-label {
-            font-size: 12px;
-            color: #a6adc8;
-            margin-bottom: -5px;
-            text-transform: uppercase;
-            letter-spacing: 1px;
-            margin-top: 10px;
-        }
+        .section-label { font-size: 12px; color: #a6adc8; margin-bottom: -5px; text-transform: uppercase; letter-spacing: 1px; margin-top: 10px; }
 
-        /* --- STYLES: Raw Editor & Modal --- */
+        /* Raw Editor & Modal */
         .editor-section { margin-top: 40px; background-color: #313244; padding: 15px; border-radius: 8px; display: flex; flex-direction: column; gap: 10px; }
         .editor-section h3 { margin: 0; padding-bottom: 10px; border-bottom: 1px solid #45475a; }
         #cfgEditor { width: 100%; height: 250px; background-color: #11111b; color: #a6e3a1; border: 1px solid #45475a; border-radius: 6px; padding: 15px; font-family: 'Courier New', Courier, monospace; font-size: 14px; resize: vertical; box-sizing: border-box; outline: none; }
@@ -227,7 +237,7 @@
                 </div>
             </div>
 
-            <div class="block main-keyboard">
+            <div class="block main-keyboard layout-ansi">
                 <div class="row">
                     <div class="key dyn-key" data-code="Backquote"></div>
                     <div class="key dyn-key" data-code="Digit1"></div>
@@ -242,6 +252,7 @@
                     <div class="key dyn-key" data-code="Digit0"></div>
                     <div class="key dyn-key" data-code="Minus"></div>
                     <div class="key dyn-key" data-code="Equal"></div>
+                    <div class="key backspace static-key" data-binds="backspace">Backspace</div>
                 </div>
                 <div class="row">
                     <div class="key tab static-key" data-binds="tab">Tab</div>
@@ -257,7 +268,7 @@
                     <div class="key dyn-key" data-code="KeyP"></div>
                     <div class="key dyn-key" data-code="BracketLeft"></div>
                     <div class="key dyn-key" data-code="BracketRight"></div>
-                </div>
+                    <div class="key dyn-key ansi-only" data-code="Backslash"></div> <div class="key enter iso-only static-key" data-binds="enter return">Enter</div> </div>
                 <div class="row">
                     <div class="key caps static-key" data-binds="caps capslock">Caps</div>
                     <div class="key dyn-key" data-code="KeyA"></div>
@@ -271,13 +282,10 @@
                     <div class="key dyn-key" data-code="KeyL"></div>
                     <div class="key dyn-key" data-code="Semicolon"></div>
                     <div class="key dyn-key" data-code="Quote"></div>
-                    <div class="key dyn-key" data-code="Backslash"></div>
-                    <div class="key enter static-key" data-binds="enter return">Enter</div>
-                </div>
+                    <div class="key dyn-key iso-only" data-code="Backslash"></div> <div class="key enter static-key" data-binds="enter return">Enter</div> </div>
                 <div class="row">
-                    <div class="key shift static-key" data-binds="shift">Shift</div>
-                    <div class="key dyn-key" data-code="IntlBackslash"></div>
-                    <div class="key dyn-key" data-code="KeyZ"></div>
+                    <div class="key shift-l static-key" data-binds="shift">Shift</div>
+                    <div class="key dyn-key iso-only" data-code="IntlBackslash"></div> <div class="key dyn-key" data-code="KeyZ"></div>
                     <div class="key dyn-key" data-code="KeyX"></div>
                     <div class="key dyn-key" data-code="KeyC"></div>
                     <div class="key dyn-key" data-code="KeyV"></div>
@@ -287,9 +295,9 @@
                     <div class="key dyn-key" data-code="Comma"></div>
                     <div class="key dyn-key" data-code="Period"></div>
                     <div class="key dyn-key" data-code="Slash"></div>
-                    <div class="key shift static-key" data-binds="rshift">Shift</div>
+                    <div class="key shift-r static-key" data-binds="rshift">Shift</div>
                 </div>
-                <div class="row">
+                <div class="row" style="justify-content: center;">
                     <div class="key static-key" data-binds="ctrl">Ctrl</div>
                     <div class="key static-key" data-binds="alt">Alt</div>
                     <div class="key space static-key" data-binds="space">Space</div>
@@ -402,10 +410,10 @@
             "IntlBackslash": "scancode100", "KeyZ": "scancode29", "KeyX": "scancode27", "KeyC": "scancode6", "KeyV": "scancode25", "KeyB": "scancode5", "KeyN": "scancode17", "KeyM": "scancode16", "Comma": "scancode54", "Period": "scancode55", "Slash": "scancode56"
         };
 
-        // --- 2. LAYOUT DICTIONARY DATABASE ---
+        // --- 2. LAYOUT DICTIONARY DATABASE (WITH PHYSICAL TYPES) ---
         const layoutsDB = {
             "qwerty_us": {
-                name: "QWERTY (US ANSI)",
+                name: "QWERTY (US ANSI)", type: "ansi",
                 keys: {
                     "Backquote": ["~ `", "`", "~"], "Digit1": ["1 !", "1"], "Digit2": ["2 @", "2"], "Digit3": ["3 #", "3"], "Digit4": ["4 $", "4"], "Digit5": ["5 %", "5"], "Digit6": ["6 ^", "6"], "Digit7": ["7 &", "7"], "Digit8": ["8 *", "8"], "Digit9": ["9 (", "9"], "Digit0": ["0 )", "0"], "Minus": ["- _", "-"], "Equal": ["= +", "="],
                     "KeyQ": ["Q", "q"], "KeyW": ["W", "w"], "KeyE": ["E", "e"], "KeyR": ["R", "r"], "KeyT": ["T", "t"], "KeyY": ["Y", "y"], "KeyU": ["U", "u"], "KeyI": ["I", "i"], "KeyO": ["O", "o"], "KeyP": ["P", "p"], "BracketLeft": ["[ {", "["], "BracketRight": ["] }", "]"],
@@ -414,7 +422,7 @@
                 }
             },
             "qwerty_uk": {
-                name: "QWERTY (UK ISO)",
+                name: "QWERTY (UK ISO)", type: "iso",
                 keys: {
                     "Backquote": ["` ¬", "`"], "Digit1": ["1 !", "1"], "Digit2": ["2 \"", "2"], "Digit3": ["3 £", "3"], "Digit4": ["4 $", "4"], "Digit5": ["5 %", "5"], "Digit6": ["6 ^", "6"], "Digit7": ["7 &", "7"], "Digit8": ["8 *", "8"], "Digit9": ["9 (", "9"], "Digit0": ["0 )", "0"], "Minus": ["- _", "-"], "Equal": ["= +", "="],
                     "KeyQ": ["Q", "q"], "KeyW": ["W", "w"], "KeyE": ["E", "e"], "KeyR": ["R", "r"], "KeyT": ["T", "t"], "KeyY": ["Y", "y"], "KeyU": ["U", "u"], "KeyI": ["I", "i"], "KeyO": ["O", "o"], "KeyP": ["P", "p"], "BracketLeft": ["[ {", "["], "BracketRight": ["] }", "]"],
@@ -423,7 +431,7 @@
                 }
             },
             "azerty_fr": {
-                name: "AZERTY (France)",
+                name: "AZERTY (France)", type: "iso",
                 keys: {
                     "Backquote": ["²", "²"], "Digit1": ["& 1", "1", "&"], "Digit2": ["é 2", "2", "é"], "Digit3": ["\" 3", "3", "\""], "Digit4": ["' 4", "4", "'"], "Digit5": ["( 5", "5", "("], "Digit6": ["- 6", "6", "-"], "Digit7": ["è 7", "7", "è"], "Digit8": ["_ 8", "8", "_"], "Digit9": ["ç 9", "9", "ç"], "Digit0": ["à 0", "0", "à"], "Minus": [") °", ")"], "Equal": ["= +", "="],
                     "KeyQ": ["A", "a", "q"], "KeyW": ["Z", "z", "w"], "KeyE": ["E", "e"], "KeyR": ["R", "r"], "KeyT": ["T", "t"], "KeyY": ["Y", "y"], "KeyU": ["U", "u"], "KeyI": ["I", "i"], "KeyO": ["O", "o"], "KeyP": ["P", "p"], "BracketLeft": ["^ ¨", "^", "["], "BracketRight": ["$ £", "$", "]"],
@@ -432,7 +440,7 @@
                 }
             },
             "azerty_be": {
-                name: "AZERTY (Belgium)",
+                name: "AZERTY (Belgium)", type: "iso",
                 keys: {
                     "Backquote": ["² ³", "²"], "Digit1": ["& 1", "1", "&"], "Digit2": ["é 2", "2", "é"], "Digit3": ["\" 3", "3", "\""], "Digit4": ["' 4", "4", "'"], "Digit5": ["( 5", "5", "("], "Digit6": ["§ 6", "6", "§"], "Digit7": ["è 7", "7", "è"], "Digit8": ["! 8", "8", "!"], "Digit9": ["ç 9", "9", "ç"], "Digit0": ["à 0", "0", "à"], "Minus": [") °", ")"], "Equal": ["- _", "-"],
                     "KeyQ": ["A", "a", "q"], "KeyW": ["Z", "z", "w"], "KeyE": ["E", "e"], "KeyR": ["R", "r"], "KeyT": ["T", "t"], "KeyY": ["Y", "y"], "KeyU": ["U", "u"], "KeyI": ["I", "i"], "KeyO": ["O", "o"], "KeyP": ["P", "p"], "BracketLeft": ["^ ¨", "^", "["], "BracketRight": ["$ *", "$", "]"],
@@ -441,7 +449,7 @@
                 }
             },
             "qwertz_de": {
-                name: "QWERTZ (Germany)",
+                name: "QWERTZ (Germany)", type: "iso",
                 keys: {
                     "Backquote": ["^ °", "^"], "Digit1": ["1 !", "1"], "Digit2": ["2 \"", "2"], "Digit3": ["3 §", "3"], "Digit4": ["4 $", "4"], "Digit5": ["5 %", "5"], "Digit6": ["6 &", "6"], "Digit7": ["7 /", "7"], "Digit8": ["8 (", "8"], "Digit9": ["9 )", "9"], "Digit0": ["0 =", "0"], "Minus": ["ß ?", "ß"], "Equal": ["´ `", "´"],
                     "KeyQ": ["Q", "q"], "KeyW": ["W", "w"], "KeyE": ["E", "e"], "KeyR": ["R", "r"], "KeyT": ["T", "t"], "KeyY": ["Z", "z", "y"], "KeyU": ["U", "u"], "KeyI": ["I", "i"], "KeyO": ["O", "o"], "KeyP": ["P", "p"], "BracketLeft": ["Ü", "ü", "["], "BracketRight": ["+ *", "+", "]"],
@@ -450,7 +458,7 @@
                 }
             },
             "qwerty_es": {
-                name: "QWERTY (Spanish)",
+                name: "QWERTY (Spanish)", type: "iso",
                 keys: {
                     "Backquote": ["º ª", "º"], "Digit1": ["1 !", "1"], "Digit2": ["2 \"", "2"], "Digit3": ["3 ·", "3"], "Digit4": ["4 $", "4"], "Digit5": ["5 %", "5"], "Digit6": ["6 &", "6"], "Digit7": ["7 /", "7"], "Digit8": ["8 (", "8"], "Digit9": ["9 )", "9"], "Digit0": ["0 =", "0"], "Minus": ["' ?", "'"], "Equal": ["¡ ¿", "¡"],
                     "KeyQ": ["Q", "q"], "KeyW": ["W", "w"], "KeyE": ["E", "e"], "KeyR": ["R", "r"], "KeyT": ["T", "t"], "KeyY": ["Y", "y"], "KeyU": ["U", "u"], "KeyI": ["I", "i"], "KeyO": ["O", "o"], "KeyP": ["P", "p"], "BracketLeft": ["` ^", "`", "["], "BracketRight": ["+ *", "+", "]"],
@@ -459,7 +467,7 @@
                 }
             },
             "qwerty_nordic": {
-                name: "QWERTY (Nordic ISO)",
+                name: "QWERTY (Nordic ISO)", type: "iso",
                 keys: {
                     "Backquote": ["§ ½", "§"], "Digit1": ["1 !", "1"], "Digit2": ["2 \"", "2"], "Digit3": ["3 #", "3"], "Digit4": ["4 ¤", "4"], "Digit5": ["5 %", "5"], "Digit6": ["6 &", "6"], "Digit7": ["7 /", "7"], "Digit8": ["8 (", "8"], "Digit9": ["9 )", "9"], "Digit0": ["0 =", "0"], "Minus": ["+ ?", "+"], "Equal": ["´ `", "´"],
                     "KeyQ": ["Q", "q"], "KeyW": ["W", "w"], "KeyE": ["E", "e"], "KeyR": ["R", "r"], "KeyT": ["T", "t"], "KeyY": ["Y", "y"], "KeyU": ["U", "u"], "KeyI": ["I", "i"], "KeyO": ["O", "o"], "KeyP": ["P", "p"], "BracketLeft": ["Å", "å", "["], "BracketRight": ["¨ ^", "¨", "]"],
@@ -468,7 +476,7 @@
                 }
             },
             "dvorak": {
-                name: "Dvorak",
+                name: "Dvorak", type: "ansi",
                 keys: {
                     "Backquote": ["` ~", "`"], "Digit1": ["1 !", "1"], "Digit2": ["2 @", "2"], "Digit3": ["3 #", "3"], "Digit4": ["4 $", "4"], "Digit5": ["5 %", "5"], "Digit6": ["6 ^", "6"], "Digit7": ["7 &", "7"], "Digit8": ["8 *", "8"], "Digit9": ["9 (", "9"], "Digit0": ["0 )", "0"], "Minus": ["[ {", "["], "Equal": ["] }", "]"],
                     "KeyQ": ["' \"", "'"], "KeyW": [", <", ","], "KeyE": [". >", "."], "KeyR": ["P", "p"], "KeyT": ["Y", "y"], "KeyY": ["F", "f"], "KeyU": ["G", "g"], "KeyI": ["C", "c"], "KeyO": ["R", "r"], "KeyP": ["L", "l"], "BracketLeft": ["/ ?", "/"], "BracketRight": ["= +", "="],
@@ -477,7 +485,7 @@
                 }
             },
             "colemak": {
-                name: "Colemak",
+                name: "Colemak", type: "ansi",
                 keys: {
                     "Backquote": ["` ~", "`"], "Digit1": ["1 !", "1"], "Digit2": ["2 @", "2"], "Digit3": ["3 #", "3"], "Digit4": ["4 $", "4"], "Digit5": ["5 %", "5"], "Digit6": ["6 ^", "6"], "Digit7": ["7 &", "7"], "Digit8": ["8 *", "8"], "Digit9": ["9 (", "9"], "Digit0": ["0 )", "0"], "Minus": ["- _", "-"], "Equal": ["= +", "="],
                     "KeyQ": ["Q", "q"], "KeyW": ["W", "w"], "KeyE": ["F", "f"], "KeyR": ["P", "p"], "KeyT": ["G", "g"], "KeyY": ["J", "j"], "KeyU": ["L", "l"], "KeyI": ["U", "u"], "KeyO": ["Y", "y"], "KeyP": ["; :", ";"], "BracketLeft": ["[ {", "["], "BracketRight": ["] }", "]"],
@@ -486,7 +494,7 @@
                 }
             },
             "workman": {
-                name: "Workman",
+                name: "Workman", type: "ansi",
                 keys: {
                     "Backquote": ["` ~", "`"], "Digit1": ["1 !", "1"], "Digit2": ["2 @", "2"], "Digit3": ["3 #", "3"], "Digit4": ["4 $", "4"], "Digit5": ["5 %", "5"], "Digit6": ["6 ^", "6"], "Digit7": ["7 &", "7"], "Digit8": ["8 *", "8"], "Digit9": ["9 (", "9"], "Digit0": ["0 )", "0"], "Minus": ["- _", "-"], "Equal": ["= +", "="],
                     "KeyQ": ["Q", "q"], "KeyW": ["D", "d"], "KeyE": ["R", "r"], "KeyR": ["W", "w"], "KeyT": ["B", "b"], "KeyY": ["J", "j"], "KeyU": ["F", "f"], "KeyI": ["U", "u"], "KeyO": ["P", "p"], "KeyP": ["; :", ";"], "BracketLeft": ["[ {", "["], "BracketRight": ["] }", "]"],
@@ -496,7 +504,6 @@
             }
         };
 
-        // --- 3. APPLICATION LOGIC ---
         const cfgInput = document.getElementById('cfgInput');
         const layoutSwitch = document.getElementById('layoutSwitch');
         const tooltip = document.getElementById('tooltip');
@@ -506,7 +513,6 @@
         let binds = {}; 
         let loadedFileName = "cs2_binds.cfg"; 
 
-        // Populate Layout Dropdown
         for (const [key, layout] of Object.entries(layoutsDB)) {
             const option = document.createElement('option');
             option.value = key;
@@ -515,7 +521,6 @@
             layoutSwitch.appendChild(option);
         }
 
-        // Handle File Upload
         cfgInput.addEventListener('change', function(event) {
             const file = event.target.files[0];
             if (!file) return;
@@ -531,39 +536,44 @@
             reader.readAsText(file);
         });
 
-        // Handle File Download / Save
         btnDownloadCfg.addEventListener('click', function() {
             const cfgText = cfgEditor.value;
-            
             const blob = new Blob([cfgText], { type: 'text/plain' });
             const url = URL.createObjectURL(blob);
             const a = document.createElement('a');
             a.href = url;
             a.download = loadedFileName;
-            
             document.body.appendChild(a);
             a.click();
-            
             document.body.removeChild(a);
             URL.revokeObjectURL(url);
         });
 
-        // Handle Layout Switch
         layoutSwitch.addEventListener('change', function() {
             updateKeyboardVisuals();
             updateKeyboardBinds();
         });
 
-        // Handle Textarea direct typing
         cfgEditor.addEventListener('input', function() {
             parseCFG(cfgEditor.value);
             updateKeyboardBinds();
         });
 
-        // Update Key Faces
         function updateKeyboardVisuals() {
             const currentLayout = layoutSwitch.value;
-            const db = layoutsDB[currentLayout].keys;
+            const layoutObj = layoutsDB[currentLayout];
+            const db = layoutObj.keys;
+            const type = layoutObj.type || "ansi";
+
+            // Toggle CSS classes to physically adjust the layout shape!
+            const mk = document.querySelector('.main-keyboard');
+            if (type === 'iso') {
+                mk.classList.remove('layout-ansi');
+                mk.classList.add('layout-iso');
+            } else {
+                mk.classList.remove('layout-iso');
+                mk.classList.add('layout-ansi');
+            }
 
             document.querySelectorAll('.dyn-key').forEach(key => {
                 const code = key.getAttribute('data-code');
@@ -575,7 +585,6 @@
             });
         }
 
-        // Parse CS2 CFG
         function parseCFG(text) {
             binds = {}; 
             const lines = text.split('\n');
@@ -589,29 +598,6 @@
             }
         }
 
-        // Map Binds to UI
-        function updateKeyboardBinds() {
-            const currentLayout = layoutSwitch.value;
-            const db = layoutsDB[currentLayout].keys;
-
-            document.querySelectorAll('.key').forEach(keyElement => {
-                keyElement.classList.remove('bound');
-                keyElement.removeAttribute('data-active-bind');
-
-                let possibleBinds = getPossibleBindNames(keyElement);
-
-                for (let keyName of possibleBinds) {
-                    if (binds[keyName.toLowerCase()]) {
-                        keyElement.classList.add('bound');
-                        keyElement.setAttribute('data-active-bind', keyName.toLowerCase());
-                        break; 
-                    }
-                }
-            });
-        }
-
-        // Logic for Editor Modal & Data Manipulation
-        
         function getPossibleBindNames(keyElement) {
             let possibleBinds = [];
             const currentLayout = layoutSwitch.value;
@@ -632,10 +618,27 @@
             return possibleBinds;
         }
 
+        function updateKeyboardBinds() {
+            document.querySelectorAll('.key').forEach(keyElement => {
+                keyElement.classList.remove('bound');
+                keyElement.removeAttribute('data-active-bind');
+
+                let possibleBinds = getPossibleBindNames(keyElement);
+
+                for (let keyName of possibleBinds) {
+                    if (binds[keyName.toLowerCase()]) {
+                        keyElement.classList.add('bound');
+                        keyElement.setAttribute('data-active-bind', keyName.toLowerCase());
+                        break; 
+                    }
+                }
+            });
+        }
+
         function setupTooltips() {
             document.querySelectorAll('.key').forEach(keyElement => {
                 keyElement.addEventListener('mouseenter', (e) => {
-                    if (keyElement.classList.contains('hidden')) return;
+                    if (keyElement.classList.contains('hidden') || keyElement.style.display === 'none') return;
                     const activeKey = keyElement.getAttribute('data-active-bind');
                     if (keyElement.classList.contains('bound') && activeKey && binds[activeKey.toLowerCase()]) {
                         tooltip.style.display = 'block';
@@ -725,7 +728,6 @@
             modalBindInput.value = '';
         }
 
-        // Modify the configuration inside the raw text window without destroying comments or formatting
         function modifyRawCFG(keyElement, newCommand) {
             let lines = cfgEditor.value.split(/\r?\n/);
             const possibleBinds = getPossibleBindNames(keyElement).map(b => b.toLowerCase());
@@ -747,24 +749,21 @@
                 let line = lines[i];
                 let lineTrimmed = line.trim();
                 
-                // Match and remove old unbinds for this key so we don't spam duplicates
                 if (lineTrimmed.toLowerCase().startsWith('unbind ')) {
                     const match = lineTrimmed.match(/^unbind\s+"?([^"\s]+)"?(\s*\/\/.*)?$/i);
                     if (match) {
                         const unboundKey = match[1].toLowerCase();
                         if (possibleBinds.includes(unboundKey)) {
-                            continue; // Skip pushing this old unbind line
+                            continue; 
                         }
                     }
                 }
 
-                // Match lines starting with bind (case insensitive)
                 if (lineTrimmed.toLowerCase().startsWith('bind ')) {
                     const match = lineTrimmed.match(/^bind\s+"?([^"\s]+)"?\s+"?(.*?)"?(\s*\/\/.*)?$/i);
                     if (match) {
                         const boundKey = match[1].toLowerCase();
                         if (possibleBinds.includes(boundKey)) {
-                            // If user is setting a new bind, inject the unbind and the new bind here
                             if (newCommand && !bindUpdated) {
                                 let comment = match[3] || '';
                                 newLines.push(`unbind "${primaryName}"`);
@@ -772,11 +771,9 @@
                                 bindUpdated = true;
                                 unbindInjected = true;
                             } else if (!newCommand && !unbindInjected) {
-                                // If user clicked Unbind, just output the unbind line and no bind line
                                 newLines.push(`unbind "${primaryName}"`);
                                 unbindInjected = true;
                             }
-                            // Do not push the old bind line to the new array
                             continue;
                         }
                     }
@@ -784,15 +781,13 @@
                 newLines.push(line);
             }
 
-            // If the bind didn't exist in the file previously, append it to the bottom
             if (newCommand && !bindUpdated) {
                 if (newLines.length > 0 && newLines[newLines.length - 1].trim() !== '') {
-                    newLines.push(""); // Add an empty line spacing if needed
+                    newLines.push(""); 
                 }
                 newLines.push(`unbind "${primaryName}"`);
                 newLines.push(`bind "${primaryName}" "${newCommand}"`);
             } else if (!newCommand && !unbindInjected) {
-                // If they clicked unbind on a key that had nothing in the text editor
                 if (newLines.length > 0 && newLines[newLines.length - 1].trim() !== '') {
                     newLines.push(""); 
                 }
@@ -806,7 +801,7 @@
             closeModal();
         }
 
-        // Initialize view
+        // INIT
         updateKeyboardVisuals();
         setupTooltips();
         setupModal();
