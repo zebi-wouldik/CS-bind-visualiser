@@ -1,43 +1,35 @@
-# Changelog
+# Ultimate CS2 Bind & CFG Editor
 
-All notable changes to the CS2 Bind Visualizer will be documented in this file.
+A powerful, browser-based visual editor for Counter-Strike 2 configuration files (.cfg). This tool allows users to visualize their keybinds on a virtual keyboard, manage game variables, and synchronize/compare two different configuration files in real-time.
 
-## [1.5.0] - Comparison & Layout Enhancements
-### Added
-- **View Layout Switcher:** Added options for "Auto", "Left/Right" (Side-by-Side), and "Top/Bottom" (Stacked) views.
-- **Identification Tags:** Added explicit `[File A]` and `[File B]` labels to headers and modals to distinguish between files with identical names.
-- **Enhanced Tooltips:** Tooltips now show the status of both File A and File B simultaneously with colored emoji indicators (🟦, 🟨, 🟩, 🟥).
+## 🚀 Features
 
-## [1.4.0] - Commands & Variable Support
-### Added
-- **Variables Section:** Added a dedicated list for non-bind commands (aliases, cvars, and settings).
-- **Command Diffing:** Comparison mode now tracks differences in game variables, not just keybinds.
-- **Command Modal:** New modal to edit command names and values separately.
-- **Add Command:** Button to inject new variables into the config.
-### Fixed
-- Restored all international keyboard layouts (Nordic, Dvorak, Colemak, etc.) that were previously missing.
+### ⌨️ Visual Keyboard
+- **Multiple Layouts:** Supports QWERTY (US/UK), AZERTY (FR/BE), QWERTZ (DE), Spanish, Nordic, Dvorak, Colemak, and Workman.
+- **Visual Feedback:** Keys are highlighted based on their status (Bound, Unbound, Conflict, or Added).
+- **Interactive Editing:** Click any key to change its bind or unbind it directly.
 
-## [1.3.0] - The Sync Update
-### Added
-- **Cross-File Copy:** Added a "Copy from other config" button inside the keybind modal.
-- **Dual-Pane Logic:** Bi-directional copying (Copy from A to B, or B to A).
-- **Auto-Save:** Clicking the "Copy" button instantly saves and updates the config.
+### 📋 Command & Variable Management
+- **Beyond Binds:** Automatically parses and lists all non-bind commands (e.g., `fps_max`, `sv_cheats`, `alias`).
+- **Structured Editing:** Modify the command name and value separately in a clean interface.
 
-## [1.2.0] - Comparison Mode
-### Added
-- **Pane B:** Introduced the second editor and keyboard for comparison.
-- **Diff Coloring:** Implemented the color-coded logic for Matches, Conflicts, Additions, and Missing keys.
-- **Legend:** Added a visual legend for comparison colors.
+### ⚖️ Live Comparison (Diff Mode)
+- **Dual Pane View:** Load two configs side-by-side (e.g., your `autoexec.cfg` and a pro player's config).
+- **Smart Highlighting:**
+  - **Match (Blue):** Identical binds/values in both files.
+  - **Conflict (Yellow):** Same key/command but different values.
+  - **Added (Green):** Key/command exists only in the current file.
+  - **Missing (Red/Dashed):** Key/command exists only in the other file.
+- **One-Click Sync:** Instantly copy binds or variables from one config to the other using the "Copy from other" button.
 
-## [1.1.0] - Live Editor
-### Added
-- **Integrated Textareas:** Added live text editors below the keyboards.
-- **Live Parsing:** Changes in the text editor update the keyboard visualization instantly.
-- **Export System:** Added functionality to download the modified text as a `.cfg` file.
+### 🛠 Ergonomics
+- **Flexible Layouts:** Switch between "Auto", "Side-by-Side", or "Stacked" views.
+- **File Integrity:** Generates clean `.cfg` code with `unbind` safety and preserves comments where possible.
+- **Client-Side:** All processing happens in your browser. Your files are never uploaded to a server.
 
-## [1.0.0] - Initial Release
-### Added
-- **Virtual Keyboard:** Basic visualization of CS2 binds.
-- **Layout Support:** Initial QWERTY and AZERTY support.
-- **Scancode Mapping:** Support for `scancodeXX` engine names.
-- **Tooltips:** Hovering over a key displays the current bind.
+## 🖥 How to Use
+1. Open `index.html` in any modern web browser.
+2. **Load:** Click "Choose File" or paste your config text directly into the editors.
+3. **Edit:** Click keys on the keyboard or items in the command list.
+4. **Compare:** Enable "Compare Mode" to open the second pane.
+5. **Export:** Click "Export File" to download your modified `.cfg`.
